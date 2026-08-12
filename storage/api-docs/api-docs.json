@@ -1,0 +1,1291 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "FitCareer API",
+        "description": "FitCareer REST API documentation.",
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/api/v1",
+            "description": "API version 1"
+        }
+    ],
+    "paths": {
+        "/auth/me": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get the authenticated user profile",
+                "operationId": "f65f9fd55e66f19b68407706b758b2ee",
+                "responses": {
+                    "200": {
+                        "description": "Authenticated user returned"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/auth/email/verification-notification": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Resend email verification notification",
+                "operationId": "14803dc54ad9c033ed11be3f5a6f2156",
+                "responses": {
+                    "200": {
+                        "description": "Verification notification sent"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/auth/email/verify/{id}/{hash}": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Verify email address",
+                "operationId": "26879d184285975dbf699a620b517b30",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "hash",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Email verified"
+                    },
+                    "403": {
+                        "description": "Invalid verification link"
+                    }
+                }
+            }
+        },
+        "/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Authenticate and issue a Sanctum API token",
+                "operationId": "f5de0e5436c793d616a1b0a4e149484a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login successful"
+                    },
+                    "401": {
+                        "description": "Invalid credentials"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    },
+                    "429": {
+                        "description": "Too many requests"
+                    }
+                }
+            }
+        },
+        "/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Revoke the current Sanctum access token",
+                "operationId": "e1d43531b73d491a174eb34d9e132137",
+                "responses": {
+                    "200": {
+                        "description": "Logged out successfully"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/auth/forgot-password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Request a password reset link",
+                "operationId": "9a0ae819714b817526dd4e04a9588b2d",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Generic success response"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    },
+                    "429": {
+                        "description": "Too many requests"
+                    }
+                }
+            }
+        },
+        "/auth/reset-password": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Reset password using token",
+                "operationId": "d0558c8e8eeae8406e8c7ad26686518e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "token",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "token": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password reset successful"
+                    },
+                    "422": {
+                        "description": "Invalid token or validation failed"
+                    },
+                    "429": {
+                        "description": "Too many requests"
+                    }
+                }
+            }
+        },
+        "/auth/password": {
+            "put": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Update the authenticated user password",
+                "operationId": "fb5c4a96c33168a2efda102b5776053c",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "current_password",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "current_password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Password updated"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register a new candidate or company account",
+                "operationId": "eb19d5a2f0fdcec5fc02fe18a480f1f8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Ada Lovelace"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "ada@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "candidate",
+                                            "company"
+                                        ]
+                                    },
+                                    "company_name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Registered successfully"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    },
+                    "429": {
+                        "description": "Too many requests"
+                    }
+                }
+            }
+        },
+        "/candidate/certifications": {
+            "get": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "List candidate certifications",
+                "operationId": "92341473fe813fd0f95eff736bf95179",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Create candidate certification",
+                "operationId": "c284a48db2402d072279306bf1d3435e",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/certifications/{certification}": {
+            "put": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Update candidate certification",
+                "operationId": "0722eeaccf1f34369d72b23959e248c8",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Delete candidate certification",
+                "operationId": "87cd484f4a2cbc486cd005cea7339a6b",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/cv": {
+            "get": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Get CV metadata for authenticated candidate",
+                "operationId": "67951e715ddd8a0f5009b616ee318e8d",
+                "responses": {
+                    "200": {
+                        "description": "CV metadata returned"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Upload or replace candidate CV",
+                "operationId": "730b97c1ad5b805858e85b27f354747a",
+                "responses": {
+                    "200": {
+                        "description": "CV uploaded"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Delete candidate CV",
+                "operationId": "31e36455afb113620eb747e083f7f87c",
+                "responses": {
+                    "200": {
+                        "description": "CV deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/educations": {
+            "get": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "List candidate educations",
+                "operationId": "49732063490d82a2875e09d2b54cfcf0",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Create candidate education",
+                "operationId": "0a8cf1c1cf17f0ee0e2f6397564bde9c",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/educations/{education}": {
+            "put": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Update candidate education",
+                "operationId": "4e0eb1979e58438a89c8e6ab36ae6ded",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Delete candidate education",
+                "operationId": "678ab96ffd40d49c1cf9133b2987d47e",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/experiences": {
+            "get": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "List candidate experiences",
+                "operationId": "4cab2f062db38c7a22db0bd500cd0ddb",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Create candidate experience",
+                "operationId": "c72797ac4736331f2507e834b6638c0d",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/experiences/{experience}": {
+            "put": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Update candidate experience",
+                "operationId": "bd6df817c4a69c2f1821750766ce3c44",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Delete candidate experience",
+                "operationId": "4c367116a8d8cf1150f8bf3b409ed85e",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/profile": {
+            "get": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Get authenticated candidate profile",
+                "operationId": "8a84aa6e109249fddab94761f15224b9",
+                "responses": {
+                    "200": {
+                        "description": "Profile returned"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Update authenticated candidate profile",
+                "operationId": "8f808514a5e0b448acc5816d927e31e0",
+                "responses": {
+                    "200": {
+                        "description": "Profile updated"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/profile/photo": {
+            "post": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Upload candidate profile photo",
+                "operationId": "df9d096733d926a51e151a051fca139a",
+                "responses": {
+                    "200": {
+                        "description": "Photo uploaded"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Delete candidate profile photo",
+                "operationId": "ddf830ee611002312350e1fff69e87fd",
+                "responses": {
+                    "200": {
+                        "description": "Photo deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/projects": {
+            "get": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "List candidate projects",
+                "operationId": "ff0c81a0137ba5ff62f3a849af1704f3",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Create candidate project",
+                "operationId": "e97bf91198b97be00d0c7060b794c36c",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/projects/{project}": {
+            "put": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Update candidate project",
+                "operationId": "1e2ec03f677209f107a120877976e0c0",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Delete candidate project",
+                "operationId": "ba2b05480a35bafa22e7f19df1344ad6",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/skills": {
+            "get": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "List candidate skills",
+                "operationId": "4af2e250bf48cb6790646e6ada968c2a",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Attach skill to candidate profile",
+                "operationId": "fa85c9fa76907d01a59e10be85c5d2df",
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/skills/{candidateSkill}": {
+            "put": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Update candidate skill pivot",
+                "operationId": "1fe5cac9535f5a755c96d38ca047cda9",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Detach skill from candidate profile",
+                "operationId": "abedda36348f9db41f5f2449121e1e00",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/skills": {
+            "get": {
+                "tags": [
+                    "Candidate"
+                ],
+                "summary": "Search skills catalog for autocomplete",
+                "operationId": "899906b590d300b8cc77fed8fded3d92",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Skills returned"
+                    }
+                }
+            }
+        },
+        "/company/jobs": {
+            "get": {
+                "tags": [
+                    "Company Jobs"
+                ],
+                "summary": "List company jobs",
+                "operationId": "97527c0410d16e4e04127061afd06026",
+                "responses": {
+                    "200": {
+                        "description": "Jobs returned"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Company Jobs"
+                ],
+                "summary": "Create internal job draft",
+                "operationId": "727c7b3b152ef30b3624cb7f91322ff4",
+                "responses": {
+                    "201": {
+                        "description": "Job created"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/company/jobs/{job}": {
+            "get": {
+                "tags": [
+                    "Company Jobs"
+                ],
+                "summary": "Get company job detail",
+                "operationId": "be514bad2bb030251e83e083ff709f84",
+                "parameters": [
+                    {
+                        "name": "job",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Job returned"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Company Jobs"
+                ],
+                "summary": "Update company job draft",
+                "operationId": "dae7d0597f3738c165b15db5a0018f21",
+                "parameters": [
+                    {
+                        "name": "job",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Job updated"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/company/jobs/{job}/publish": {
+            "post": {
+                "tags": [
+                    "Company Jobs"
+                ],
+                "summary": "Publish company job draft",
+                "operationId": "6f3c48ba69a4cafcad365d0d309ae671",
+                "parameters": [
+                    {
+                        "name": "job",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Job published"
+                    },
+                    "422": {
+                        "description": "Invalid state"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/company/profile": {
+            "get": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Get authenticated company profile",
+                "operationId": "ee2cbfdbcfd57212cfff55005bd9fe08",
+                "responses": {
+                    "200": {
+                        "description": "Company profile returned"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Update authenticated company profile",
+                "operationId": "faf0e34ba64a702ead89342870d6f803",
+                "responses": {
+                    "200": {
+                        "description": "Company profile updated"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/company/profile/logo": {
+            "post": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Upload company logo",
+                "operationId": "a8e2497688c5abf776300abf5556f883",
+                "responses": {
+                    "200": {
+                        "description": "Logo uploaded"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Delete company logo",
+                "operationId": "78433f6331aa2ae77499072af7a6fb49",
+                "responses": {
+                    "200": {
+                        "description": "Logo deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/companies/{slug}": {
+            "get": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Get public company profile by slug",
+                "operationId": "f12b1fbe48dbcc4d889c274dbfe1dddd",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Public company profile returned"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/company/verification/request": {
+            "post": {
+                "tags": [
+                    "Company"
+                ],
+                "summary": "Request company verification review",
+                "operationId": "b12983cc59b0be1ca23c9f45816d46fa",
+                "responses": {
+                    "200": {
+                        "description": "Verification requested"
+                    },
+                    "422": {
+                        "description": "Invalid state"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/jobs/{slug}": {
+            "get": {
+                "tags": [
+                    "Jobs"
+                ],
+                "summary": "Get published job detail by slug",
+                "operationId": "7fc887c5c5ec835239a29caed4c4ba2d",
+                "parameters": [
+                    {
+                        "name": "slug",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Job detail returned"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                }
+            }
+        },
+        "/jobs": {
+            "get": {
+                "tags": [
+                    "Jobs"
+                ],
+                "summary": "Search published jobs",
+                "operationId": "dbce22a9f9b64e2e910a4f25e504f8f8",
+                "parameters": [
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "location",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "category",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "min_fit_score",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Jobs returned"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    },
+                    "429": {
+                        "description": "Too many requests"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "bearerFormat": "Sanctum",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Candidate",
+            "description": "Candidate"
+        },
+        {
+            "name": "Company Jobs",
+            "description": "Company Jobs"
+        },
+        {
+            "name": "Company",
+            "description": "Company"
+        },
+        {
+            "name": "Jobs",
+            "description": "Jobs"
+        }
+    ]
+}
