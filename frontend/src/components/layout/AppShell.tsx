@@ -8,7 +8,7 @@ export function AppShell() {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background text-ink">
+    <div className="min-h-screen overflow-x-hidden bg-background text-ink">
       <div className="flex min-h-screen">
         <div className="hidden lg:block">
           <Sidebar />
@@ -32,7 +32,7 @@ export function AppShell() {
           <Sidebar onNavigate={() => setMobileOpen(false)} />
         </div>
 
-        <div className="flex min-h-screen flex-1 flex-col">
+        <div className="flex min-h-screen min-w-0 flex-1 flex-col">
           <Header onMenuClick={() => setMobileOpen(true)} />
           <main className="flex-1 px-4 py-6 lg:px-8 lg:py-8">
             <Outlet />

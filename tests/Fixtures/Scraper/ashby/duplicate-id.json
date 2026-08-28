@@ -1,0 +1,43 @@
+{
+    "apiVersion": "1",
+    "jobs": [
+        {
+            "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+            "title": "Duplicate Role Original",
+            "department": "Engineering",
+            "employmentType": "FullTime",
+            "location": "Istanbul",
+            "publishedAt": "2026-07-01T10:00:00.000+00:00",
+            "isListed": true,
+            "isRemote": false,
+            "workplaceType": "OnSite",
+            "address": {
+                "postalAddress": {
+                    "addressCountry": "Turkey",
+                    "addressLocality": "Istanbul"
+                }
+            },
+            "jobUrl": "https://jobs.ashbyhq.com/example/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+            "descriptionPlain": "Original description."
+        },
+        {
+            "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+            "title": "Duplicate Role Updated",
+            "department": "Engineering",
+            "employmentType": "FullTime",
+            "location": "Istanbul",
+            "publishedAt": "2026-08-01T10:00:00.000+00:00",
+            "isListed": true,
+            "isRemote": false,
+            "workplaceType": "OnSite",
+            "address": {
+                "postalAddress": {
+                    "addressCountry": "Turkey",
+                    "addressLocality": "Istanbul"
+                }
+            },
+            "jobUrl": "https://jobs.ashbyhq.com/example/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+            "descriptionPlain": "Updated description."
+        }
+    ]
+}

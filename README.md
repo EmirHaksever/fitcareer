@@ -1,6 +1,8 @@
 # FitCareer
 
-Job platform for candidates and employers — Laravel API backend with a React + TypeScript frontend.
+Aday ve işveren için iş platformu. Laravel API + React / TypeScript arayüz: kayıt/giriş, CV profili, iş arama, ilan taslak/yayın, başvuru, doğrulama, Trust Score ve Fit Score.
+
+Personal portfolio project — not a company codebase.
 
 ## Stack
 
@@ -72,11 +74,6 @@ php artisan test
 # Frontend
 cd frontend && npm test
 ```
-
-## Documentation
-
-- [`FITCAREER_CURRENT_STATE.md`](FITCAREER_CURRENT_STATE.md) — living project status & handoff context
-- [`KARIYER_NET_ACCESS_REPORT.md`](KARIYER_NET_ACCESS_REPORT.md) — Kariyer.net WAF diagnostic
 
 ## Security
 

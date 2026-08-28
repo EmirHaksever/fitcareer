@@ -77,6 +77,35 @@ class JobScorePresenter
     }
 
     /**
+     * Company application Match/Fit presentation from the existing snapshot + latest analysis.
+     *
+     * @return array{match_analysis_status: ?string, match_details: ?array<string, mixed>}
+     */
+    public static function companyMatchFields(
+        Job $job,
+        int $candidateProfileId,
+        ?int $snapshotScore,
+        bool $includeDetails = false,
+    ): array {
+        $analysis = self::resolveFitAnalysis($job, $candidateProfileId);
+        $status = $analysis?->status?->value;
+
+        if ($snapshotScore !== null && $status === null) {
+            $status = AiAnalysisStatus::Completed->value;
+        }
+
+        $details = null;
+        if ($includeDetails && $analysis !== null && $analysis->status === AiAnalysisStatus::Completed) {
+            $details = self::formatFitDetails($analysis->details ?? []);
+        }
+
+        return [
+            'match_analysis_status' => $status,
+            'match_details' => $details,
+        ];
+    }
+
+    /**
      * @param  array<string, mixed>  $details
      * @return array<string, mixed>|null
      */

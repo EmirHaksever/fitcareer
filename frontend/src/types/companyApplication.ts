@@ -1,4 +1,14 @@
 import type { ApplicationStatus, ApplicationStatusHistory } from '@/types/application';
+import type { FitScoreDetails } from '@/types/fitScore';
+
+export type CompanyApplicationSort =
+  | 'attention'
+  | 'match_score_desc'
+  | 'match_score_asc'
+  | 'applied_at_desc'
+  | 'applied_at_asc';
+
+export type MatchAnalysisStatus = 'pending' | 'completed' | 'failed' | null;
 
 export interface CompanyApplicationCandidateUser {
   id: number;
@@ -23,6 +33,9 @@ export interface CompanyApplicationJob {
   city: string | null;
   country: string | null;
   status: string;
+  experience_level?: string | null;
+  employment_type?: string | null;
+  work_type?: string | null;
 }
 
 export interface CompanyApplication {
@@ -32,6 +45,8 @@ export interface CompanyApplication {
   status: ApplicationStatus;
   cover_letter: string | null;
   match_score: number | null;
+  match_analysis_status?: MatchAnalysisStatus;
+  match_details?: FitScoreDetails | null;
   trust_score: number | null;
   resume_snapshot_path: string | null;
   applied_at: string;
@@ -56,6 +71,7 @@ export interface CompanyApplicationListParams {
   per_page?: number;
   job_id?: number;
   status?: ApplicationStatus;
+  sort?: CompanyApplicationSort;
 }
 
 export interface UpdateCompanyApplicationStatusPayload {
@@ -72,7 +88,9 @@ export interface CompanyJobOption {
   country?: string | null;
   work_type?: string | null;
   employment_type?: string | null;
+  experience_level?: string | null;
   published_at?: string | null;
+  applications_count?: number;
 }
 
 export interface PaginatedCompanyJobs {

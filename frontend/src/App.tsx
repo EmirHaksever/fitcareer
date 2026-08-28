@@ -21,7 +21,11 @@ import { CompanyDashboardPage } from '@/pages/company/CompanyDashboardPage';
 import { CompanyJobCreatePage } from '@/pages/company/CompanyJobCreatePage';
 import { CompanyJobEditPage } from '@/pages/company/CompanyJobEditPage';
 import { CompanyJobsPage } from '@/pages/company/CompanyJobsPage';
+import { CompanySettingsPage } from '@/pages/company/CompanySettingsPage';
 import { SavedJobsPage } from '@/pages/candidate/SavedJobsPage';
+import { FitAnalysisPage } from '@/pages/candidate/FitAnalysisPage';
+import { NotificationsPage } from '@/pages/candidate/NotificationsPage';
+import { SettingsPage } from '@/pages/candidate/SettingsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -53,38 +57,19 @@ export default function App() {
               <Route element={<AppShell />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/jobs" element={<JobsPage />} />
-                <Route path="/jobs/:slug" element={<JobDetailPage />} />
                 <Route path="/applications" element={<ApplicationsPage />} />
                 <Route path="/applications/:id" element={<ApplicationDetailPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
-                <Route
-                  path="/fit-analysis"
-                  element={
-                    <PlaceholderPage
-                      title="Uyum Analizi"
-                      description="Fit analysis endpoint henüz backend'de yok."
-                    />
-                  }
-                />
+                <Route path="/fit-analysis" element={<FitAnalysisPage />} />
                 <Route path="/saved" element={<SavedJobsPage />} />
-                <Route
-                  path="/notifications"
-                  element={
-                    <PlaceholderPage
-                      title="Bildirimler"
-                      description="Notifications modülü BATCH 4 kapsamında tamamlanacak."
-                    />
-                  }
-                />
-                <Route
-                  path="/settings"
-                  element={
-                    <PlaceholderPage
-                      title="Ayarlar"
-                      description="Settings modülü BATCH 4 kapsamında tamamlanacak."
-                    />
-                  }
-                />
+                <Route path="/notifications" element={<NotificationsPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+              </Route>
+            </Route>
+
+            <Route element={<ProtectedRoute allowedRoles={['candidate', 'company']} />}>
+              <Route element={<AppShell />}>
+                <Route path="/jobs/:slug" element={<JobDetailPage />} />
               </Route>
             </Route>
 
@@ -96,6 +81,7 @@ export default function App() {
                 <Route path="/company/jobs/:id/edit" element={<CompanyJobEditPage />} />
                 <Route path="/company/applications" element={<CompanyApplicationsPage />} />
                 <Route path="/company/applications/:id" element={<CompanyApplicationDetailPage />} />
+                <Route path="/company/settings" element={<CompanySettingsPage />} />
               </Route>
             </Route>
 

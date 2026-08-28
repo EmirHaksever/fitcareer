@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { translateUserFacingApiMessage } from '@/utils/authValidationMessages';
 import type { ApiResponse } from '@/types/api';
 
 export function formatValidationErrorMessage(
@@ -15,10 +16,14 @@ export function formatValidationErrorMessage(
     .join(' · ');
 
   if (details) {
-    return `${error.response?.data?.message ?? 'Validation failed.'} (${details})`;
+    const message = translateUserFacingApiMessage(
+      error.response?.data?.message ?? 'Validation failed.',
+      'Doğrulama hatası oluştu.',
+    );
+    return `${message} (${details})`;
   }
 
-  return error.response?.data?.message ?? fallback;
+  return translateUserFacingApiMessage(error.response?.data?.message ?? '', fallback) || fallback;
 }
 
 function isValidationError(error: unknown): boolean {

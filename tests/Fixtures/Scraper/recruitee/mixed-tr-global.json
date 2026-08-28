@@ -1,0 +1,42 @@
+{
+    "offers": [
+        {
+            "id": 7777001,
+            "slug": "istanbul-engineer",
+            "title": "Software Engineer Istanbul",
+            "description": "<p>Turkey role.</p>",
+            "country": "Türkiye",
+            "country_code": "TR",
+            "city": "İstanbul",
+            "location": "İstanbul, İstanbul, Türkiye",
+            "remote": false,
+            "hybrid": false,
+            "on_site": true,
+            "employment_type_code": "fulltime_permanent",
+            "published_at": "2026-08-01 10:00:00 UTC",
+            "updated_at": "2026-08-02 10:00:00 UTC",
+            "careers_url": "https://example.recruitee.com/o/istanbul-engineer",
+            "careers_apply_url": "https://example.recruitee.com/o/istanbul-engineer/c/new",
+            "status": "published"
+        },
+        {
+            "id": 7777002,
+            "slug": "london-engineer",
+            "title": "Software Engineer London",
+            "description": "<p>Global role.</p>",
+            "country": "United Kingdom",
+            "country_code": "GB",
+            "city": "London",
+            "location": "London, United Kingdom",
+            "remote": false,
+            "hybrid": false,
+            "on_site": true,
+            "employment_type_code": "fulltime_permanent",
+            "published_at": "2026-08-01 10:00:00 UTC",
+            "updated_at": "2026-08-02 10:00:00 UTC",
+            "careers_url": "https://example.recruitee.com/o/london-engineer",
+            "careers_apply_url": "https://example.recruitee.com/o/london-engineer/c/new",
+            "status": "published"
+        }
+    ]
+}

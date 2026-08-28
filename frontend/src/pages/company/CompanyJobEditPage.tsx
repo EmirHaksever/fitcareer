@@ -11,6 +11,8 @@ import { EmptyState, Skeleton } from '@/components/ui/States';
 import { getApiErrorMessage, getValidationErrors } from '@/api/client';
 import { useCompanyJob, usePublishCompanyJob, useUpdateCompanyJob } from '@/hooks/useCompanyJobs';
 import { sanitizePayload } from '@/utils/payload';
+import { validateCompanyJobPayload } from '@/utils/companyJobValidation';
+import { companyPublicJobPath } from '@/utils/companyPortal';
 
 function mapValidationErrors(errors: Record<string, string[]>): Record<string, string> {
   return Object.fromEntries(
@@ -63,12 +65,19 @@ export function CompanyJobEditPage() {
 
   const isDraft = job?.status === 'draft';
   const isPublished = job?.status === 'published';
+  const publicListingPath = job ? companyPublicJobPath(job.status, job.slug) : null;
 
   async function handleSave(payload: CompanyJobFormValues) {
     if (!job) return;
 
     setFormErrors({});
     setBannerError(null);
+
+    const clientErrors = validateCompanyJobPayload(payload);
+    if (Object.keys(clientErrors).length > 0) {
+      setFormErrors(clientErrors);
+      return;
+    }
 
     try {
       await updateJob.mutateAsync({
@@ -146,8 +155,8 @@ export function CompanyJobEditPage() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {isPublished ? (
-              <Link to={`/jobs/${job.slug}`} target="_blank" rel="noreferrer">
+            {publicListingPath ? (
+              <Link to={publicListingPath} target="_blank" rel="noreferrer">
                 <Button type="button" variant="outline">
                   <ExternalLink className="h-4 w-4" aria-hidden="true" />
                   İlanı Görüntüle

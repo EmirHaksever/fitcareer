@@ -198,18 +198,6 @@ export function buildFitBreakdown(details?: FitScoreDetails | null): FitBreakdow
   });
 }
 
-export function shouldShowFitScoreBadge(
-  showForRole: boolean,
-  score: number | null,
-  status: string | null,
-): boolean {
-  if (!showForRole) {
-    return false;
-  }
-
-  if (score !== null) {
-    return true;
-  }
-
-  return status === 'pending' || status === 'analyzing';
+export function shouldShowFitScoreBadge(showForRole: boolean): boolean {
+  return showForRole;
 }

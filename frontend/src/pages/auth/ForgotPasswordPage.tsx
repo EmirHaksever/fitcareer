@@ -2,7 +2,13 @@ import { useState, type FormEvent } from 'react';
 import { Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { authApi } from '@/api/auth';
-import { getApiErrorMessage, getValidationErrors } from '@/api/client';
+import { getValidationErrors } from '@/api/client';
+import {
+  mapAuthFieldErrors,
+  resolveForgotPasswordError,
+  resolveNetworkErrorMessage,
+  translateAuthApiMessage,
+} from '@/utils/authValidationMessages';
 import { AuthFormCard } from '@/components/auth/AuthFormCard';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -23,11 +29,17 @@ export function ForgotPasswordPage() {
 
     try {
       const responseMessage = await authApi.forgotPassword({ email });
-      setMessage(responseMessage);
+      setMessage(translateAuthApiMessage(responseMessage));
     } catch (submitError) {
       const validation = getValidationErrors(submitError);
-      setFieldError(validation.email?.[0]);
-      setError(getApiErrorMessage(submitError));
+      const mapped = mapAuthFieldErrors(validation, ['email'], 'forgot_password');
+      setFieldError(mapped.email || undefined);
+      setError(
+        mapped.email
+          ? null
+          : resolveNetworkErrorMessage(submitError) ||
+              resolveForgotPasswordError(validation, ''),
+      );
     } finally {
       setLoading(false);
     }

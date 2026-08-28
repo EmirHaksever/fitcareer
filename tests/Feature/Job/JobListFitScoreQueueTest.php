@@ -20,11 +20,12 @@ class JobListFitScoreQueueTest extends TestCase
     use CreatesJobActors;
 
     #[Test]
-    public function candidate_job_list_queues_missing_fit_analyses(): void
+    public function candidate_job_list_computes_fit_analyses_synchronously(): void
     {
         Queue::fake();
 
         [, $profile, $token] = $this->createCandidateActor();
+        $profile->update(['work_preference' => WorkPreference::Remote, 'years_of_experience' => 4]);
         $category = 'queue-fit-list-'.uniqid();
         $jobs = Job::factory()->published()->count(2)->create([
             'category' => $category,
@@ -34,24 +35,19 @@ class JobListFitScoreQueueTest extends TestCase
             ->getJson('/api/v1/jobs?category='.urlencode($category))
             ->assertOk();
 
-        Queue::assertPushed(AnalyzeCvJobFitJob::class, function (AnalyzeCvJobFitJob $queued) use ($profile, $jobs): bool {
-            return $queued->candidateProfileId === $profile->id
-                && in_array($queued->jobId, $jobs->pluck('id')->all(), true);
-        });
-
-        Queue::assertPushed(AnalyzeCvJobFitJob::class, 2);
+        Queue::assertNothingPushed();
 
         $items = $response->json('data.items');
         $this->assertCount(2, $items);
-        $this->assertSame('pending', $items[0]['fit_analysis_status']);
-        $this->assertNull($items[0]['fit_score']);
-        $this->assertSame('pending', $items[1]['fit_analysis_status']);
+        $this->assertSame('completed', $items[0]['fit_analysis_status']);
+        $this->assertNotNull($items[0]['fit_score']);
+        $this->assertSame('completed', $items[1]['fit_analysis_status']);
 
         $this->assertSame(2, AiAnalysis::query()
             ->where('candidate_profile_id', $profile->id)
             ->whereIn('job_id', $jobs->pluck('id'))
             ->where('type', AiAnalysisType::CvJobFit)
-            ->where('status', AiAnalysisStatus::Pending)
+            ->where('status', AiAnalysisStatus::Completed)
             ->where('is_latest', true)
             ->count());
     }
@@ -123,7 +119,7 @@ class JobListFitScoreQueueTest extends TestCase
     }
 
     #[Test]
-    public function stale_completed_analysis_is_requeued_when_fingerprint_changes(): void
+    public function stale_completed_analysis_is_recomputed_on_job_list_when_fingerprint_changes(): void
     {
         Queue::fake();
 
@@ -132,7 +128,7 @@ class JobListFitScoreQueueTest extends TestCase
 
         $category = 'queue-fit-stale-'.uniqid();
         $job = Job::factory()->published()->create(['category' => $category]);
-        app(CvJobFitAnalysisService::class)->analyze($profile, $job);
+        $previous = app(CvJobFitAnalysisService::class)->analyze($profile, $job);
 
         $profile->update(['years_of_experience' => 10]);
 
@@ -140,11 +136,19 @@ class JobListFitScoreQueueTest extends TestCase
             ->getJson('/api/v1/jobs?category='.urlencode($category))
             ->assertOk();
 
-        Queue::assertPushed(AnalyzeCvJobFitJob::class, function (AnalyzeCvJobFitJob $queued) use ($profile, $job): bool {
-            return $queued->candidateProfileId === $profile->id && $queued->jobId === $job->id;
-        });
+        Queue::assertNothingPushed();
 
-        $this->assertSame('pending', $response->json('data.items.0.fit_analysis_status'));
+        $this->assertSame('completed', $response->json('data.items.0.fit_analysis_status'));
+        $this->assertNotNull($response->json('data.items.0.fit_score'));
+
+        $latest = AiAnalysis::query()
+            ->where('job_id', $job->id)
+            ->where('candidate_profile_id', $profile->id)
+            ->where('type', AiAnalysisType::CvJobFit)
+            ->where('is_latest', true)
+            ->first();
+
+        $this->assertNotSame($previous->id, $latest?->id);
     }
 
     #[Test]
@@ -180,13 +184,14 @@ class JobListFitScoreQueueTest extends TestCase
     }
 
     #[Test]
-    public function paginated_job_list_uses_correct_candidate_and_job_combinations(): void
+    public function paginated_job_list_computes_fit_analyses_for_visible_page_only(): void
     {
         Queue::fake();
 
         [, $profile, $token] = $this->createCandidateActor();
+        $profile->update(['work_preference' => WorkPreference::Remote, 'years_of_experience' => 4]);
         $category = 'queue-fit-page-'.uniqid();
-        $jobs = Job::factory()->published()->count(3)->create(['category' => $category]);
+        Job::factory()->published()->count(3)->create(['category' => $category]);
 
         $response = $this->withToken($token)
             ->getJson('/api/v1/jobs?category='.urlencode($category).'&per_page=2&page=1')
@@ -195,17 +200,18 @@ class JobListFitScoreQueueTest extends TestCase
         $returnedJobIds = collect($response->json('data.items'))->pluck('id')->all();
         $this->assertCount(2, $returnedJobIds);
 
-        Queue::assertPushed(AnalyzeCvJobFitJob::class, function (AnalyzeCvJobFitJob $job) use ($profile, $returnedJobIds): bool {
-            return $job->candidateProfileId === $profile->id
-                && in_array($job->jobId, $returnedJobIds, true);
-        });
+        Queue::assertNothingPushed();
 
-        Queue::assertPushed(AnalyzeCvJobFitJob::class, 2);
+        foreach ($response->json('data.items') as $item) {
+            $this->assertSame('completed', $item['fit_analysis_status']);
+            $this->assertNotNull($item['fit_score']);
+        }
 
         $this->assertSame(2, AiAnalysis::query()
             ->where('candidate_profile_id', $profile->id)
             ->where('type', AiAnalysisType::CvJobFit)
             ->whereIn('job_id', $returnedJobIds)
+            ->where('status', AiAnalysisStatus::Completed)
             ->count());
     }
 

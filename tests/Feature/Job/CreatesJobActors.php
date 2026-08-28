@@ -32,7 +32,10 @@ trait CreatesJobActors
     protected function createCandidateActor(): array
     {
         $user = User::factory()->create(['role' => UserRole::Candidate]);
-        $profile = CandidateProfile::factory()->create(['user_id' => $user->id]);
+        $profile = CandidateProfile::factory()->create([
+            'user_id' => $user->id,
+            'cv_file_path' => 'candidate/cvs/test.pdf',
+        ]);
         UserSetting::query()->create(['user_id' => $user->id]);
         $token = $user->createToken('api-access')->plainTextToken;
 

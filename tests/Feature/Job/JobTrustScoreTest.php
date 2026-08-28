@@ -119,6 +119,7 @@ class JobTrustScoreTest extends TestCase
                 'requirements' => 'PHP',
                 'employment_type' => 'full_time',
                 'work_type' => 'remote',
+                'country' => 'Turkey',
                 'contact_email' => 'jobs@example.com',
             ])
             ->assertCreated();

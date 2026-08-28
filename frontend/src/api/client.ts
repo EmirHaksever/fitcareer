@@ -1,5 +1,9 @@
 import axios, { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import type { ApiResponse } from '@/types/api';
+import {
+  isNetworkError,
+  translateUserFacingApiMessage,
+} from '@/utils/authValidationMessages';
 
 const TOKEN_KEY = 'fitcareer_token';
 
@@ -50,8 +54,15 @@ apiClient.interceptors.response.use(
 );
 
 export function getApiErrorMessage(error: unknown, fallback = 'Bir hata oluştu.'): string {
+  if (isNetworkError(error)) {
+    return 'Bağlantı kurulamadı. Lütfen tekrar deneyin.';
+  }
+
   if (axios.isAxiosError<ApiResponse<null>>(error)) {
-    return error.response?.data?.message ?? fallback;
+    const message = error.response?.data?.message;
+    if (message) {
+      return translateUserFacingApiMessage(message, fallback);
+    }
   }
 
   return fallback;

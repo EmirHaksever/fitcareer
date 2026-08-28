@@ -7,13 +7,13 @@ import {
   Home,
   LayoutDashboard,
   Settings,
-  Sparkles,
   Users,
 } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
 import { Logo } from '@/components/brand/Logo';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody } from '@/components/ui/Card';
+import { CareerAssistantCard } from '@/components/layout/CareerAssistantCard';
 import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/utils/format';
 
@@ -32,6 +32,7 @@ const companyNav = [
   { to: '/company/dashboard', label: 'Ana Sayfa', icon: Home },
   { to: '/company/jobs', label: 'İlanlarım', icon: BriefcaseBusiness },
   { to: '/company/applications', label: 'Başvurular', icon: Users },
+  { to: '/company/settings', label: 'Ayarlar', icon: Settings },
 ];
 
 interface SidebarProps {
@@ -92,21 +93,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
             </CardBody>
           </Card>
         ) : (
-          <Card className="overflow-hidden border-primary/10 bg-gradient-to-br from-primary/5 to-secondary/5">
-            <CardBody className="space-y-3">
-              <div className="flex items-center gap-2 text-primary">
-                <Sparkles className="h-4 w-4" aria-hidden="true" />
-                <p className="text-sm font-semibold">Kariyer Asistanı</p>
-              </div>
-              <p className="text-xs leading-5 text-ink-muted">
-                CV uyum analizini başlat ve sana en uygun ilanları keşfet.
-              </p>
-              <Button className="w-full" size="sm" disabled>
-                Analiz Başlat
-              </Button>
-              <p className="text-[11px] text-ink-subtle">TODO: Fit analysis endpoint bekleniyor</p>
-            </CardBody>
-          </Card>
+          <CareerAssistantCard onNavigate={onNavigate} />
         )}
       </div>
     </aside>

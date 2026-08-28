@@ -7,7 +7,7 @@ import { FitScoreBadge } from '@/components/jobs/FitScoreBadge';
 import { TrustScore } from '@/components/ui/TrustScore';
 import { Card, CardBody } from '@/components/ui/Card';
 import { formatEmploymentType, formatLocation, formatWorkType, cn } from '@/utils/format';
-import { getJobCompanyName, isExternalJob } from '@/utils/jobSource';
+import { getJobCompanyName, isExternalJob, isVerifiedCompany } from '@/utils/jobSource';
 import { useToggleSavedJob } from '@/hooks/useSavedJobs';
 import { shouldShowFitScoreBadge } from '@/utils/fitScoreBreakdown';
 import type { JobListItem } from '@/types/api';
@@ -65,13 +65,16 @@ export function JobCard({
                 ) : (
                   <JobMetaTag className="text-primary">Başvur</JobMetaTag>
                 )}
+                {isVerifiedCompany(job) ? (
+                  <JobMetaTag className="text-primary">Doğrulanmış şirket</JobMetaTag>
+                ) : null}
               </div>
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-3 border-t border-surface pt-4 sm:justify-end sm:border-t-0 sm:pt-0">
-            <div className="flex items-center gap-4 sm:gap-5">
-              {shouldShowFitScoreBadge(showFitScore, job.fit_score, job.fit_analysis_status) ? (
+          <div className="flex items-end justify-between gap-3 border-t border-surface pt-4 sm:justify-end sm:border-t-0 sm:pt-0">
+            <div className="flex items-end gap-4 sm:gap-5">
+              {shouldShowFitScoreBadge(showFitScore) ? (
                 <FitScoreBadge
                   score={job.fit_score}
                   status={job.fit_analysis_status}

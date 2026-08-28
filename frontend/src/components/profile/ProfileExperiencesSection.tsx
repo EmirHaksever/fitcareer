@@ -11,6 +11,7 @@ import { EmptyState } from '@/components/ui/States';
 import { ProfileSectionCard } from '@/components/profile/ProfileSectionCard';
 import { EMPLOYMENT_TYPE_OPTIONS, selectClassName } from '@/components/profile/profileFormOptions';
 import { CANDIDATE_PROFILE_KEY } from '@/hooks/useCandidateProfile';
+import { invalidateFitRelatedQueries } from '@/hooks/invalidateFitQueries';
 import type { CandidateExperience, ExperiencePayload } from '@/types/candidate';
 import { sanitizePayload } from '@/utils/payload';
 import { formatDateRange, formatEmploymentType } from '@/utils/format';
@@ -44,7 +45,10 @@ export function ProfileExperiencesSection({
   const [form, setForm] = useState<ExperiencePayload>(emptyForm);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  const invalidate = () => void queryClient.invalidateQueries({ queryKey: CANDIDATE_PROFILE_KEY });
+  const invalidate = () => {
+    void queryClient.invalidateQueries({ queryKey: CANDIDATE_PROFILE_KEY });
+    invalidateFitRelatedQueries(queryClient);
+  };
 
   const saveMutation = useMutation({
     mutationFn: async () => {

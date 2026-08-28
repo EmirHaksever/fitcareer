@@ -14,6 +14,7 @@ use App\Models\Job;
 use App\Models\User;
 use App\Services\AI\CvJobFitAnalysisService;
 use App\Services\AI\JobTrustAnalysisService;
+use App\Services\Job\InternalJobQualityGate;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -104,6 +105,8 @@ class JobService
             ]);
         }
 
+        InternalJobQualityGate::assertJobPublishable($job);
+
         $job->status = JobStatus::Published;
         $job->published_at = now();
         $job->save();
@@ -144,9 +147,11 @@ class JobService
         if ($candidateProfileId !== null) {
             $profile = CandidateProfile::query()->find($candidateProfileId);
 
-            if ($profile !== null) {
+            if ($profile !== null && $profile->cv_file_path !== null) {
                 $analysis = $this->cvJobFitAnalysisService->analyze($profile, $job);
                 $job->setRelation('analyses', collect([$analysis]));
+            } else {
+                $job->setRelation('analyses', collect());
             }
         }
 

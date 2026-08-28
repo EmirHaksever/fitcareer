@@ -31,4 +31,28 @@ class CompanyAuthorizationTest extends TestCase
             ->getJson('/api/v1/company/profile')
             ->assertForbidden();
     }
+
+    #[Test]
+    public function company_logout_revokes_token_and_blocks_protected_routes(): void
+    {
+        [, , $token] = $this->createCompanyActor();
+
+        $this->withToken($token)
+            ->getJson('/api/v1/company/profile')
+            ->assertOk();
+
+        $this->withToken($token)
+            ->postJson('/api/v1/auth/logout')
+            ->assertOk();
+
+        $this->app['auth']->forgetGuards();
+
+        $this->withToken($token)
+            ->getJson('/api/v1/company/profile')
+            ->assertUnauthorized();
+
+        $this->withToken($token)
+            ->getJson('/api/v1/company/jobs')
+            ->assertUnauthorized();
+    }
 }

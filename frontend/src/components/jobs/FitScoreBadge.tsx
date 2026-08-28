@@ -25,7 +25,9 @@ export function FitScoreBadge({ score, status, size = 'sm', className }: FitScor
       />
       {!pending && displayScore !== null ? (
         <p className="mt-0.5 text-xs font-medium text-secondary">{getFitBandLabel(band)}</p>
-      ) : null}
+      ) : (
+        <span className="mt-0.5 block h-4" aria-hidden="true" />
+      )}
     </div>
   );
 }

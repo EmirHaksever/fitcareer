@@ -11,6 +11,7 @@ import {
 } from '@/components/jobs/jobFilterOptions';
 import type { CreateCompanyJobPayload } from '@/types/companyJob';
 import { cn } from '@/utils/format';
+import { COMPANY_JOB_FORM_DEFAULTS } from '@/utils/companyJobValidation';
 
 export type CompanyJobFormValues = CreateCompanyJobPayload;
 
@@ -26,23 +27,7 @@ interface CompanyJobFormProps {
 }
 
 const defaultValues: CompanyJobFormValues = {
-  title: '',
-  description: '',
-  requirements: '',
-  responsibilities: '',
-  category: 'engineering',
-  employment_type: 'full_time',
-  work_type: 'remote',
-  experience_level: 'mid',
-  city: '',
-  country: 'Türkiye',
-  salary_min: null,
-  salary_max: null,
-  salary_currency: 'TRY',
-  is_salary_visible: false,
-  application_deadline: null,
-  contact_email: '',
-  contact_phone: '',
+  ...COMPANY_JOB_FORM_DEFAULTS,
 };
 
 function FieldError({ message }: { message?: string }) {
@@ -155,6 +140,7 @@ export function CompanyJobForm({
       responsibilities: form.responsibilities?.trim() || null,
       city: form.city?.trim() || null,
       country: form.country?.trim() || null,
+      experience_level: form.experience_level?.trim() || null,
       contact_email: form.contact_email?.trim() || null,
       contact_phone: form.contact_phone?.trim() || null,
       application_deadline: form.application_deadline || null,
@@ -182,7 +168,7 @@ export function CompanyJobForm({
             name="title"
             value={form.title}
             onChange={(event) => updateField('title', event.target.value)}
-            placeholder="Örn. Senior Backend Developer"
+            placeholder="Örn. Junior Backend Developer"
             error={errors.title}
             required
           />
@@ -211,7 +197,7 @@ export function CompanyJobForm({
               name="work_type"
               value={form.work_type}
               onChange={(value) => updateField('work_type', value)}
-              options={WORK_TYPE_OPTIONS}
+              options={[{ value: '', label: 'Seçiniz' }, ...WORK_TYPE_OPTIONS]}
               error={errors.work_type}
             />
             <SelectField
@@ -227,9 +213,9 @@ export function CompanyJobForm({
           <SelectField
             label="Deneyim Seviyesi"
             name="experience_level"
-            value={form.experience_level ?? 'mid'}
-            onChange={(value) => updateField('experience_level', value)}
-            options={EXPERIENCE_LEVEL_OPTIONS}
+            value={form.experience_level ?? ''}
+            onChange={(value) => updateField('experience_level', value || null)}
+            options={[{ value: '', label: 'Belirtilmedi' }, ...EXPERIENCE_LEVEL_OPTIONS]}
             error={errors.experience_level}
           />
         </CardBody>

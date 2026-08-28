@@ -31,6 +31,7 @@ readonly class JobSearchQuery
         public ?string $sort = null,
         public int $page = 1,
         public int $perPage = 15,
+        public bool $includeGlobal = false,
     ) {}
 
     /**
@@ -52,6 +53,7 @@ readonly class JobSearchQuery
             sort: self::nullableString($input, 'sort'),
             page: max(1, (int) ($input['page'] ?? 1)),
             perPage: max(1, min(100, (int) ($input['per_page'] ?? 15))),
+            includeGlobal: filter_var($input['include_global'] ?? false, FILTER_VALIDATE_BOOL),
         );
     }
 
@@ -72,6 +74,7 @@ readonly class JobSearchQuery
             sort: $this->sort,
             page: $this->page,
             perPage: $this->perPage,
+            includeGlobal: $this->includeGlobal,
         );
     }
 

@@ -8,6 +8,8 @@ use App\Enums\EmploymentType;
 use App\Enums\ExperienceLevel;
 use App\Enums\WorkType;
 use App\Http\Requests\ApiFormRequest;
+use App\Models\Job;
+use App\Services\Job\InternalJobQualityGate;
 use Illuminate\Validation\Rule;
 
 class UpdateJobRequest extends ApiFormRequest
@@ -50,5 +52,30 @@ class UpdateJobRequest extends ApiFormRequest
             'trust_analysis_status' => ['prohibited'],
             'slug' => ['prohibited'],
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator): void {
+            $job = $this->route('job');
+            $current = [];
+
+            if ($job instanceof Job) {
+                $current = [
+                    'description' => $job->description,
+                    'work_type' => $job->work_type?->value,
+                    'city' => $job->city,
+                    'country' => $job->country,
+                ];
+            }
+
+            foreach (InternalJobQualityGate::validatePayload($this->all(), $current) as $field => $messages) {
+                foreach ($messages as $message) {
+                    if (! $validator->errors()->has($field)) {
+                        $validator->errors()->add($field, $message);
+                    }
+                }
+            }
+        });
     }
 }

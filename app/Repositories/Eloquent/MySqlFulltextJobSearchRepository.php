@@ -11,11 +11,18 @@ use App\Enums\JobStatus;
 use App\Enums\TrustAnalysisStatus;
 use App\Models\Job;
 use App\Repositories\Contracts\JobSearchRepositoryInterface;
+use App\Services\Job\JobSearchQueryExpander;
+use App\Services\Scraper\LocationClassificationService;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 
 class MySqlFulltextJobSearchRepository implements JobSearchRepositoryInterface
 {
+    public function __construct(
+        private readonly LocationClassificationService $locationClassifier,
+        private readonly JobSearchQueryExpander $queryExpander,
+    ) {}
+
     public function search(JobSearchQuery $query): LengthAwarePaginator
     {
         $builder = Job::query()
@@ -43,6 +50,7 @@ class MySqlFulltextJobSearchRepository implements JobSearchRepositoryInterface
         $this->applySalaryFilters($builder, $query);
         $this->applyTrustScoreFilter($builder, $query);
         $this->applyFitScoreFilter($builder, $query);
+        $this->locationClassifier->applyTurkeyRelevantScope($builder, $query->includeGlobal);
         $this->applySorting($builder, $query);
 
         return $builder->paginate(
@@ -63,6 +71,16 @@ class MySqlFulltextJobSearchRepository implements JobSearchRepositoryInterface
             return;
         }
 
+        if ($this->queryExpander->shouldUseBooleanMode($keyword)) {
+            $builder->whereFullText(
+                ['title', 'description'],
+                $this->queryExpander->toBooleanFulltext($keyword),
+                ['mode' => 'boolean'],
+            );
+
+            return;
+        }
+
         $builder->whereFullText(['title', 'description'], $keyword);
     }
 
@@ -74,10 +92,14 @@ class MySqlFulltextJobSearchRepository implements JobSearchRepositoryInterface
 
         $location = trim($query->location);
 
-        $builder->where(function (Builder $locationQuery) use ($location): void {
-            $locationQuery
-                ->where('city', 'like', '%'.$location.'%')
-                ->orWhere('country', 'like', '%'.$location.'%');
+        $variants = $this->queryExpander->locationVariants($location);
+
+        $builder->where(function (Builder $locationQuery) use ($variants): void {
+            foreach ($variants as $variant) {
+                $locationQuery
+                    ->orWhere('city', 'like', '%'.$variant.'%')
+                    ->orWhere('country', 'like', '%'.$variant.'%');
+            }
         });
     }
 

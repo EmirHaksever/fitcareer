@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
 import { EmptyState, Skeleton } from '@/components/ui/States';
 import { useProfileCvActions } from '@/components/profile/useProfileCvActions';
@@ -26,6 +27,7 @@ const TABS: { id: ProfileTab; label: string }[] = [
 ];
 
 export function ProfilePage() {
+  const [searchParams] = useSearchParams();
   const { data: profile, isLoading, isError, refetch } = useCandidateProfile();
   const { data: cvMeta } = useCandidateCv();
   const { uploadCv } = useCandidateProfileMutations();
@@ -33,6 +35,13 @@ export function ProfilePage() {
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [suggestCvFill, setSuggestCvFill] = useState(false);
   const [cvImportDismissed, setCvImportDismissed] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('cv') === '1') {
+      setSuggestCvFill(true);
+      setCvImportDismissed(false);
+    }
+  }, [searchParams]);
 
   function showSuccess(message: string) {
     setFeedback({ type: 'success', message });

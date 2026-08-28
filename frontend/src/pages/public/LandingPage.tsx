@@ -1,12 +1,9 @@
 import {
   ArrowRight,
-  BriefcaseBusiness,
   ChartLine,
   FileUser,
   ShieldCheck,
   Target,
-  Users,
-  Zap,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Logo } from '@/components/brand/Logo';
@@ -52,15 +49,6 @@ const whyFeatures = [
     icon: ChartLine,
   },
 ] as const;
-
-const stats = [
-  { value: '%95', label: 'Güvenilir İlanlar', icon: ShieldCheck },
-  { value: '50K+', label: 'Aktif Kullanıcı', icon: Users },
-  { value: '10K+', label: 'Şirket', icon: BriefcaseBusiness },
-  { value: '7/24', label: 'Güncel İlanlar', icon: Zap },
-] as const;
-
-const partners = ['trendyol', 'hepsiburada', 'aselsan', 'TURKISH AIRLINES', 'Garanti BBVA', 'Koç'];
 
 export function LandingPage() {
   return (
@@ -159,47 +147,25 @@ export function LandingPage() {
               </ul>
             </div>
           </div>
-
-          <div className="mt-12 rounded-[20px] border border-[#E2E8F0] bg-white px-4 py-5 shadow-[0_1px_3px_rgba(15,23,42,0.05)] sm:px-6">
-            <div className="grid grid-cols-2 gap-6 lg:grid-cols-4">
-              {stats.map((stat, index) => {
-                const Icon = stat.icon;
-
-                return (
-                  <div
-                    key={stat.label}
-                    className={`flex items-center gap-3 ${index > 0 ? 'lg:border-l lg:border-[#E2E8F0] lg:pl-6' : ''}`}
-                  >
-                    <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#D1FAE5] text-primary">
-                      <Icon className="h-5 w-5" aria-hidden="true" />
-                    </span>
-                    <div>
-                      <p className="text-lg font-bold text-[#0F172A]">{stat.value}</p>
-                      <p className="text-sm text-[#64748B]">{stat.label}</p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
         </section>
 
-        <section className="relative border-t border-[#E2E8F0] bg-white py-12">
-          <div className="mx-auto max-w-6xl px-4 text-center lg:px-8">
-            <p className="text-sm text-[#64748B]">
-              Binlerce şirket ve on binlerce aday FitCareer ile buluşuyor.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-              {partners.map((partner) => (
-                <span
-                  key={partner}
-                  className="text-sm font-semibold uppercase tracking-wide text-[#94A3B8]"
-                >
-                  {partner}
-                </span>
-              ))}
+        <section className="mx-auto max-w-6xl px-4 pb-20 lg:px-8">
+          <div className="overflow-hidden rounded-[20px] border border-[#E2E8F0] bg-white shadow-[0_4px_24px_rgba(15,23,42,0.06),0_12px_48px_rgba(15,23,42,0.04)]">
+            <div className="flex items-center gap-1.5 border-b border-[#E2E8F0] bg-[#F8FAFC] px-4 py-3">
+              <span className="h-2.5 w-2.5 rounded-full bg-[#E2E8F0]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[#E2E8F0]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[#E2E8F0]" />
             </div>
+            <img
+              src="/assets/product-dashboard.png"
+              alt="FitCareer aday paneli — Trust Score ve Fit Score ile ilan önerileri"
+              className="w-full"
+              loading="lazy"
+            />
           </div>
+          <p className="mt-4 text-center text-sm text-[#64748B]">
+            Gerçek aday paneli: güvenilirlik skoruna göre sıralanan ilanlar ve profil uyumu.
+          </p>
         </section>
       </main>
     </div>

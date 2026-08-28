@@ -30,8 +30,13 @@ export function JobsPage() {
   const { data, isLoading, isError, refetch } = useJobs(queryParams);
 
   function updateParams(patch: Partial<JobSearchParams>) {
-    const next = { ...queryParams, ...patch };
-    setSearchParams(buildJobSearchParams(next), { replace: true });
+    setSearchParams(
+      (prev) => {
+        const current = parseJobSearchParams(prev);
+        return buildJobSearchParams({ ...current, ...patch });
+      },
+      { replace: true },
+    );
   }
 
   function resetFilters() {

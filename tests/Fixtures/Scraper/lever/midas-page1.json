@@ -1,0 +1,28 @@
+[
+    {
+        "id": "page1-job-001",
+        "text": "Backend Engineer Page One",
+        "descriptionPlain": "Page one listing.",
+        "hostedUrl": "https://jobs.lever.co/getmidas/page1-job-001",
+        "createdAt": 1783322836118,
+        "workplaceType": "hybrid",
+        "categories": {
+            "location": "Istanbul, Turkey",
+            "commitment": "Full-time",
+            "team": "Platform"
+        }
+    },
+    {
+        "id": "page1-job-002",
+        "text": "Product Manager Page One",
+        "descriptionPlain": "Second page one listing.",
+        "hostedUrl": "https://jobs.lever.co/getmidas/page1-job-002",
+        "createdAt": 1780000000000,
+        "workplaceType": "remote",
+        "categories": {
+            "location": "Ankara, Turkey",
+            "commitment": "Part-time",
+            "team": "Product"
+        }
+    }
+]

@@ -1,0 +1,30 @@
+{
+    "name": "Wingie Enuygun Group",
+    "description": "Travel marketplace",
+    "jobs": [
+        {
+            "title": "Campaign Management Specialist",
+            "shortcode": "A8A326BDEF",
+            "employment_type": "Full-time",
+            "telecommuting": false,
+            "department": "Business Development",
+            "url": "https://apply.workable.com/j/A8A326BDEF",
+            "application_url": "https://apply.workable.com/j/A8A326BDEF/apply",
+            "published_on": "2026-07-31",
+            "created_at": "2026-07-16",
+            "country": "Turkey",
+            "city": "Istanbul",
+            "state": "İstanbul",
+            "locations": [
+                {
+                    "country": "Turkey",
+                    "countryCode": "TR",
+                    "city": "Istanbul",
+                    "region": "İstanbul",
+                    "hidden": false
+                }
+            ],
+            "description": "<p>Build campaigns for <strong>global travel</strong> products.</p>"
+        }
+    ]
+}

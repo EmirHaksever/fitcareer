@@ -330,4 +330,181 @@ class CompanyApplicationTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['per_page']);
     }
+
+    #[Test]
+    public function company_application_detail_exposes_completed_match_without_inventing_score(): void
+    {
+        [$companyUser, $company, $token] = $this->createCompanyActor();
+        $job = Job::factory()->published()->create([
+            'company_id' => $company->id,
+            'posted_by' => $companyUser->id,
+            'experience_level' => \App\Enums\ExperienceLevel::Entry,
+        ]);
+        [, $application, $profile] = $this->createCompanyApplication($company, $job);
+
+        $application->update(['match_score' => 88]);
+
+        \App\Models\AiAnalysis::query()->create([
+            'type' => \App\Enums\AiAnalysisType::CvJobFit,
+            'job_id' => $job->id,
+            'candidate_profile_id' => $profile->id,
+            'score' => 88,
+            'status' => \App\Enums\AiAnalysisStatus::Completed,
+            'is_latest' => true,
+            'details' => [
+                'signals' => [
+                    'required_skills' => [
+                        'score' => 75,
+                        'confidence' => 0.9,
+                        'evidence' => [
+                            'matched_skills' => ['PHP', 'Laravel'],
+                            'missing_skills' => ['Docker'],
+                        ],
+                    ],
+                    'experience' => [
+                        'score' => 80,
+                        'confidence' => 0.9,
+                        'evidence' => [
+                            'job_experience_level' => 'entry',
+                            'candidate_years_of_experience' => 2,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->withToken($token)
+            ->getJson('/api/v1/company/applications/'.$application->id)
+            ->assertOk()
+            ->assertJsonPath('data.match_score', 88)
+            ->assertJsonPath('data.match_analysis_status', 'completed')
+            ->assertJsonPath('data.match_details.signals.required_skills.evidence.matched_skills.0', 'PHP')
+            ->assertJsonPath('data.match_details.signals.required_skills.evidence.missing_skills.0', 'Docker')
+            ->assertJsonPath('data.job.experience_level', 'entry');
+    }
+
+    #[Test]
+    public function pending_match_does_not_expose_a_fake_percentage(): void
+    {
+        [$companyUser, $company, $token] = $this->createCompanyActor();
+        $job = Job::factory()->published()->create([
+            'company_id' => $company->id,
+            'posted_by' => $companyUser->id,
+        ]);
+        [, $application, $profile] = $this->createCompanyApplication($company, $job);
+
+        \App\Models\AiAnalysis::query()->create([
+            'type' => \App\Enums\AiAnalysisType::CvJobFit,
+            'job_id' => $job->id,
+            'candidate_profile_id' => $profile->id,
+            'score' => null,
+            'status' => \App\Enums\AiAnalysisStatus::Pending,
+            'is_latest' => true,
+        ]);
+
+        $this->withToken($token)
+            ->getJson('/api/v1/company/applications/'.$application->id)
+            ->assertOk()
+            ->assertJsonPath('data.match_score', null)
+            ->assertJsonPath('data.match_analysis_status', 'pending')
+            ->assertJsonPath('data.match_details', null);
+    }
+
+    #[Test]
+    public function null_match_without_analysis_is_unavailable_not_zero(): void
+    {
+        [$companyUser, $company, $token] = $this->createCompanyActor();
+        $job = Job::factory()->published()->create([
+            'company_id' => $company->id,
+            'posted_by' => $companyUser->id,
+        ]);
+        [, $application] = $this->createCompanyApplication($company, $job);
+
+        $this->withToken($token)
+            ->getJson('/api/v1/company/applications/'.$application->id)
+            ->assertOk()
+            ->assertJsonPath('data.match_score', null)
+            ->assertJsonPath('data.match_analysis_status', null)
+            ->assertJsonPath('data.match_details', null);
+    }
+
+    #[Test]
+    public function company_application_list_sorts_by_attention_then_match(): void
+    {
+        [$companyUser, $company, $token] = $this->createCompanyActor();
+        $job = Job::factory()->published()->create([
+            'company_id' => $company->id,
+            'posted_by' => $companyUser->id,
+        ]);
+
+        $rejected = $this->createScoredApplication($job, ApplicationStatus::Rejected, 99, now()->subDays(1));
+        $lowReview = $this->createScoredApplication($job, ApplicationStatus::Submitted, 50, now()->subHours(2));
+        $highReview = $this->createScoredApplication($job, ApplicationStatus::Submitted, 90, now()->subHours(3));
+        $pendingReview = $this->createScoredApplication($job, ApplicationStatus::UnderReview, null, now()->subHours(1));
+
+        $response = $this->withToken($token)
+            ->getJson('/api/v1/company/applications')
+            ->assertOk();
+
+        $this->assertSame(
+            [$highReview->id, $lowReview->id, $pendingReview->id, $rejected->id],
+            array_column($response->json('data.items'), 'id'),
+        );
+
+        $highestFirst = $this->withToken($token)
+            ->getJson('/api/v1/company/applications?sort=match_score_desc')
+            ->assertOk();
+
+        $this->assertSame(
+            [$rejected->id, $highReview->id, $lowReview->id, $pendingReview->id],
+            array_column($highestFirst->json('data.items'), 'id'),
+        );
+
+        $this->assertArrayNotHasKey('match_details', $response->json('data.items.0'));
+    }
+
+    #[Test]
+    public function company_job_list_includes_applications_count(): void
+    {
+        [$companyUser, $company, $token] = $this->createCompanyActor();
+        $job = Job::factory()->published()->create([
+            'company_id' => $company->id,
+            'posted_by' => $companyUser->id,
+            'applications_count' => 12,
+        ]);
+
+        $this->withToken($token)
+            ->getJson('/api/v1/company/jobs')
+            ->assertOk()
+            ->assertJsonPath('data.items.0.id', $job->id)
+            ->assertJsonPath('data.items.0.applications_count', 12);
+    }
+
+    #[Test]
+    public function company_application_list_rejects_unknown_sort(): void
+    {
+        [, , $token] = $this->createCompanyActor();
+
+        $this->withToken($token)
+            ->getJson('/api/v1/company/applications?sort=not_a_sort')
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['sort']);
+    }
+
+    private function createScoredApplication(
+        Job $job,
+        ApplicationStatus $status,
+        ?int $matchScore,
+        \DateTimeInterface $appliedAt,
+    ): Application {
+        [, $profile] = $this->createCandidateActor();
+
+        return Application::factory()->create([
+            'candidate_profile_id' => $profile->id,
+            'job_id' => $job->id,
+            'status' => $status,
+            'match_score' => $matchScore,
+            'applied_at' => $appliedAt,
+        ]);
+    }
 }

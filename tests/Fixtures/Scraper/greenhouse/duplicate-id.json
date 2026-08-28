@@ -1,0 +1,35 @@
+{
+    "jobs": [
+        {
+            "absolute_url": "https://job-boards.greenhouse.io/example/jobs/1111111111",
+            "id": 1111111111,
+            "updated_at": "2026-08-01T10:00:00-04:00",
+            "title": "Duplicate Role Original",
+            "company_name": "Example Co",
+            "first_published": "2026-07-01T10:00:00-04:00",
+            "location": {
+                "name": "Istanbul"
+            },
+            "content": "&lt;p&gt;Original&lt;/p&gt;",
+            "departments": [],
+            "offices": []
+        },
+        {
+            "absolute_url": "https://job-boards.greenhouse.io/example/jobs/1111111111",
+            "id": 1111111111,
+            "updated_at": "2026-08-02T10:00:00-04:00",
+            "title": "Duplicate Role Updated",
+            "company_name": "Example Co",
+            "first_published": "2026-08-01T10:00:00-04:00",
+            "location": {
+                "name": "Istanbul"
+            },
+            "content": "&lt;p&gt;Updated&lt;/p&gt;",
+            "departments": [],
+            "offices": []
+        }
+    ],
+    "meta": {
+        "total": 2
+    }
+}

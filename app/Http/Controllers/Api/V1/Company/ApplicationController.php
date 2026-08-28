@@ -44,6 +44,7 @@ class ApplicationController extends Controller
             (int) $request->query('per_page', 15),
             $request->filled('job_id') ? (int) $request->query('job_id') : null,
             $statusEnum,
+            $request->sort(),
         );
 
         return $this->successResponse([

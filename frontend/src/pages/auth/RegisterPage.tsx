@@ -7,6 +7,10 @@ import { Input } from '@/components/ui/Input';
 import { PasswordInput } from '@/components/ui/PasswordInput';
 import { SegmentedControl } from '@/components/ui/SegmentedControl';
 import { getApiErrorMessage, getValidationErrors } from '@/api/client';
+import {
+  mapAuthFieldErrors,
+  resolveNetworkErrorMessage,
+} from '@/utils/authValidationMessages';
 import { useAuth } from '@/hooks/useAuth';
 import { getDefaultRouteForRole } from '@/utils/routing';
 
@@ -43,14 +47,19 @@ export function RegisterPage() {
       navigate(getDefaultRouteForRole(user.role));
     } catch (error) {
       const validation = getValidationErrors(error);
-      setErrors({
-        name: validation.name?.[0] ?? '',
-        email: validation.email?.[0] ?? '',
-        password: validation.password?.[0] ?? '',
-        company_name: validation.company_name?.[0] ?? '',
-        role: validation.role?.[0] ?? '',
-      });
-      setFormError(getApiErrorMessage(error, 'Kayıt başarısız.'));
+      const mapped = mapAuthFieldErrors(
+        validation,
+        ['name', 'company_name', 'email', 'password', 'password_confirmation', 'role'],
+        'register',
+      );
+      setErrors(mapped);
+      const hasFieldErrors = Object.values(mapped).some(Boolean);
+      setFormError(
+        hasFieldErrors
+          ? null
+          : resolveNetworkErrorMessage(error) ||
+              getApiErrorMessage(error, 'Kayıt başarısız. Lütfen tekrar deneyin.'),
+      );
     } finally {
       setLoading(false);
     }
@@ -143,6 +152,7 @@ export function RegisterPage() {
               icon={<Lock className="h-4 w-4" aria-hidden="true" />}
               value={passwordConfirmation}
               onChange={(event) => setPasswordConfirmation(event.target.value)}
+              error={errors.password_confirmation}
               required
             />
           </div>

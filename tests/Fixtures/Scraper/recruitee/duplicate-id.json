@@ -1,0 +1,42 @@
+{
+    "offers": [
+        {
+            "id": 8888001,
+            "slug": "duplicate-role",
+            "title": "Duplicate Role Updated",
+            "description": "<p>First copy.</p>",
+            "country": "Türkiye",
+            "country_code": "TR",
+            "city": "İstanbul",
+            "location": "İstanbul, İstanbul, Türkiye",
+            "remote": false,
+            "hybrid": true,
+            "on_site": false,
+            "employment_type_code": "fulltime_permanent",
+            "published_at": "2026-07-01 10:00:00 UTC",
+            "updated_at": "2026-07-02 10:00:00 UTC",
+            "careers_url": "https://example.recruitee.com/o/duplicate-role",
+            "careers_apply_url": "https://example.recruitee.com/o/duplicate-role/c/new",
+            "status": "published"
+        },
+        {
+            "id": 8888001,
+            "slug": "duplicate-role",
+            "title": "Duplicate Role Updated",
+            "description": "<p>Second copy in feed.</p>",
+            "country": "Türkiye",
+            "country_code": "TR",
+            "city": "İstanbul",
+            "location": "İstanbul, İstanbul, Türkiye",
+            "remote": false,
+            "hybrid": true,
+            "on_site": false,
+            "employment_type_code": "fulltime_permanent",
+            "published_at": "2026-07-01 10:00:00 UTC",
+            "updated_at": "2026-07-05 10:00:00 UTC",
+            "careers_url": "https://example.recruitee.com/o/duplicate-role",
+            "careers_apply_url": "https://example.recruitee.com/o/duplicate-role/c/new",
+            "status": "published"
+        }
+    ]
+}

@@ -125,10 +125,16 @@ class TestJobIngestionCommand extends Command
     {
         $source = JobSource::query()
             ->where('is_active', true)
-            ->where(function ($query) use ($sourceKey): void {
-                $query->whereRaw('LOWER(name) = ?', [$sourceKey])
-                    ->orWhere('config->provider', $sourceKey);
-            })
+            ->whereRaw('LOWER(name) = ?', [$sourceKey])
+            ->first();
+
+        if ($source !== null) {
+            return $source;
+        }
+
+        $source = JobSource::query()
+            ->where('is_active', true)
+            ->where('config->site_slug', $sourceKey)
             ->first();
 
         if ($source !== null) {

@@ -5,12 +5,13 @@ import {
   getExternalJobUrl,
   getJobCompanyName,
   isExternalJob,
+  isVerifiedCompany,
   openExternalJobUrl,
 } from '@/utils/jobSource';
 
 describe('jobSource utils', () => {
-  it('maps internal jobs to FitCareer', () => {
-    expect(formatJobSourceLabel({ source: 'internal' })).toBe('FitCareer');
+  it('maps internal jobs to a direct employer label', () => {
+    expect(formatJobSourceLabel({ source: 'internal' })).toBe('Doğrudan işveren ilanı');
     expect(isExternalJob({ source: 'internal' })).toBe(false);
   });
 
@@ -51,7 +52,7 @@ describe('jobSource utils', () => {
       formatJobSourceBadgeLabel({
         source: 'internal',
       }),
-    ).toBe('FITCAREER');
+    ).toBe('DOĞRUDAN İŞVEREN İLANI');
 
     expect(
       formatJobSourceBadgeLabel({
@@ -102,5 +103,12 @@ describe('jobSource utils', () => {
     openExternalJobUrl('https://remotive.com/remote-jobs/example');
     expect(openMock).toHaveBeenCalledWith('https://remotive.com/remote-jobs/example', '_blank', 'noopener,noreferrer');
     vi.unstubAllGlobals();
+  });
+
+  it('treats a company as verified only when is_verified is true', () => {
+    expect(isVerifiedCompany({ company: { is_verified: true } })).toBe(true);
+    expect(isVerifiedCompany({ company: { is_verified: false } })).toBe(false);
+    expect(isVerifiedCompany({ company: {} })).toBe(false);
+    expect(isVerifiedCompany({ company: null })).toBe(false);
   });
 });

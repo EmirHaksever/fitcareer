@@ -1,0 +1,32 @@
+{
+    "name": "Wingie Enuygun Group",
+    "description": "Travel marketplace",
+    "jobs": [
+        {
+            "title": "Duplicate Role Original",
+            "shortcode": "1FF5A9AA2B",
+            "employment_type": "Full-time",
+            "telecommuting": false,
+            "department": "Engineering",
+            "url": "https://apply.workable.com/j/1FF5A9AA2B",
+            "published_on": "2026-06-01",
+            "country": "Turkey",
+            "city": "Istanbul",
+            "locations": [],
+            "description": "<p>Original posting</p>"
+        },
+        {
+            "title": "Duplicate Role Updated",
+            "shortcode": "1FF5A9AA2B",
+            "employment_type": "Contract",
+            "telecommuting": true,
+            "department": "Product",
+            "url": "https://apply.workable.com/j/1FF5A9AA2B",
+            "published_on": "2026-07-01",
+            "country": "Turkey",
+            "city": "Ankara",
+            "locations": [],
+            "description": "<p>Updated posting</p>"
+        }
+    ]
+}

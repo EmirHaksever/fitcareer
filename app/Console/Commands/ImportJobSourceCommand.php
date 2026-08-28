@@ -51,12 +51,18 @@ class ImportJobSourceCommand extends Command
             return null;
         }
 
+        $source = JobSource::query()
+            ->where('is_active', true)
+            ->whereRaw('LOWER(name) = ?', [$sourceKey])
+            ->first();
+
+        if ($source !== null) {
+            return $source;
+        }
+
         return JobSource::query()
             ->where('is_active', true)
-            ->where(function ($query) use ($sourceKey): void {
-                $query->whereRaw('LOWER(name) = ?', [$sourceKey])
-                    ->orWhere('config->provider', $sourceKey);
-            })
+            ->where('config->site_slug', $sourceKey)
             ->first();
     }
 }

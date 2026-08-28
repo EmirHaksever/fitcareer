@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { CompanyJobForm, type CompanyJobFormValues } from '@/components/company-jobs/CompanyJobForm';
+import { validateCompanyJobPayload } from '@/utils/companyJobValidation';
 import { JobSkillsSection } from '@/components/company-jobs/JobSkillsSection';
 import { Button } from '@/components/ui/Button';
 import { companyJobSkillsApi } from '@/api/companyJobSkills';
@@ -28,6 +29,12 @@ export function CompanyJobCreatePage() {
   async function handleCreate(payload: CompanyJobFormValues, publish = false) {
     setFormErrors({});
     setBannerError(null);
+
+    const clientErrors = validateCompanyJobPayload(payload);
+    if (Object.keys(clientErrors).length > 0) {
+      setFormErrors(clientErrors);
+      return;
+    }
 
     try {
       const job = await createJob.mutateAsync(sanitizePayload(payload));
@@ -74,7 +81,8 @@ export function CompanyJobCreatePage() {
           <p className="text-sm font-medium text-primary">Yeni İlan</p>
           <h1 className="text-3xl font-bold tracking-tight text-ink">İlan Oluştur</h1>
           <p className="text-sm text-ink-muted">
-            İlanını taslak olarak kaydedebilir veya doğrudan yayınlayabilirsin.
+            İlanını taslak olarak kaydedebilir veya doğrudan yayınlayabilirsin. Çalışma tipi ve
+            konum bilinçli seçilmelidir; deneyim seviyesi varsayılan olarak atanmaz.
           </p>
         </div>
       </section>

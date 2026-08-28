@@ -11,6 +11,7 @@ class JobIngestionService
 {
     public function __construct(
         private readonly JobNormalizerService $jobNormalizerService,
+        private readonly JobSourceIngestPolicyService $jobSourceIngestPolicyService,
         private readonly DuplicateDetectionService $duplicateDetectionService,
         private readonly ScrapedJobEnrichmentService $scrapedJobEnrichmentService,
     ) {}
@@ -22,13 +23,23 @@ class JobIngestionService
     public function ingest(JobSource $source, array $rawListing): array
     {
         $attributes = $this->jobNormalizerService->normalize($source, $rawListing);
+        $this->jobSourceIngestPolicyService->assertAcceptable($source, $attributes);
         $externalId = (string) $attributes['external_id'];
         $contentHash = (string) $attributes['content_hash'];
 
         $existing = $this->duplicateDetectionService->findExisting($source, $externalId, $contentHash);
 
         if ($existing !== null) {
+            $incomingProviderUpdatedAt = $attributes['provider_updated_at'] ?? null;
+
+            unset($attributes['first_seen_at'], $attributes['provider_updated_at']);
+
             $existing->fill($attributes);
+
+            if ($incomingProviderUpdatedAt !== null) {
+                $existing->provider_updated_at = $incomingProviderUpdatedAt;
+            }
+
             $existing->save();
 
             $job = $this->scrapedJobEnrichmentService->enrich($existing);
@@ -38,6 +49,8 @@ class JobIngestionService
                 'created' => false,
             ];
         }
+
+        $attributes['first_seen_at'] = now();
 
         $job = Job::query()->create($attributes);
         $job = $this->scrapedJobEnrichmentService->enrich($job);

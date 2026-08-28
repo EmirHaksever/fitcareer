@@ -1,6 +1,7 @@
 import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { CompanyApplicationStatusBadge } from '@/components/company-applications/CompanyApplicationStatusBadge';
+import { MatchScoreDisplay } from '@/components/company-applications/MatchScoreDisplay';
 import { JobCompanyAvatar } from '@/components/jobs/JobCompanyAvatar';
 import { Card, CardBody } from '@/components/ui/Card';
 import type { CompanyApplication } from '@/types/companyApplication';
@@ -39,7 +40,14 @@ export function CompanyApplicationCard({ application }: CompanyApplicationCardPr
             <p className="text-sm font-medium text-ink">{application.job?.title ?? 'İlan bilgisi yok'}</p>
             <div className="flex flex-wrap items-center gap-3 text-sm">
               <CompanyApplicationStatusBadge status={application.status} />
-              <span className="text-ink-muted">Uyum: {formatApplicationScore(application.match_score)}</span>
+              <span className="text-ink-muted">
+                Uyum:{' '}
+                <MatchScoreDisplay
+                  score={application.match_score}
+                  status={application.match_analysis_status}
+                  variant="inline"
+                />
+              </span>
               <span className="text-ink-muted">Güven: {formatApplicationScore(application.trust_score)}</span>
             </div>
             <p className="text-xs text-ink-subtle">

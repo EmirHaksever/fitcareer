@@ -1,6 +1,8 @@
-import { Menu, Search } from 'lucide-react';
+import { Bell, Menu, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { Avatar } from '@/components/ui/Avatar';
 import { useAuth } from '@/hooks/useAuth';
+import { useNotificationUnreadCount } from '@/hooks/useNotifications';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -8,6 +10,8 @@ interface HeaderProps {
 
 export function Header({ onMenuClick }: HeaderProps) {
   const { user } = useAuth();
+  const { data: unreadData } = useNotificationUnreadCount(user?.role === 'candidate');
+  const unreadCount = unreadData?.unread_count ?? 0;
 
   return (
     <header className="flex h-16 items-center gap-4 border-b border-surface bg-white px-4 lg:px-6">
@@ -32,18 +36,20 @@ export function Header({ onMenuClick }: HeaderProps) {
       </div>
 
       <div className="ml-auto flex items-center gap-3">
-        <button
-          type="button"
-          className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-surface text-ink-muted"
-          aria-label="Bildirimler"
+        {user?.role !== 'company' ? (
+        <Link
+          to="/notifications"
+          className="relative inline-flex h-10 w-10 items-center justify-center rounded-xl border border-surface text-ink-muted transition hover:bg-background hover:text-primary"
+          aria-label={unreadCount > 0 ? `Bildirimler, ${unreadCount} okunmamış` : 'Bildirimler'}
         >
-          <span className="relative">
-            <span className="absolute right-0 top-0 h-2 w-2 rounded-full bg-warning" />
-            <svg viewBox="0 0 24 24" className="h-5 w-5 fill-none stroke-current" aria-hidden="true">
-              <path d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2c0 .5-.2 1-.6 1.4L4 17h5m6 0a3 3 0 1 1-6 0" />
-            </svg>
-          </span>
-        </button>
+          <Bell className="h-5 w-5" aria-hidden="true" />
+          {unreadCount > 0 ? (
+            <span className="absolute -right-1 -top-1 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-warning px-1 text-[10px] font-bold text-white">
+              {unreadCount > 9 ? '9+' : unreadCount}
+            </span>
+          ) : null}
+        </Link>
+        ) : null}
         {user ? <Avatar name={user.name} /> : null}
       </div>
     </header>

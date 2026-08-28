@@ -39,6 +39,7 @@ class JobSearchRequest extends ApiFormRequest
             'sort' => ['sometimes', 'nullable', 'string', Rule::in(['published_at', 'salary', 'trust_score', 'fit_score'])],
             'page' => ['sometimes', 'integer', 'min:1'],
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
+            'include_global' => ['sometimes', 'boolean'],
             'candidate_profile_id' => ['prohibited'],
         ];
     }

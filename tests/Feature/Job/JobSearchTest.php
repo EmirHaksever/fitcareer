@@ -6,6 +6,7 @@ use App\Enums\AiAnalysisStatus;
 use App\Enums\AiAnalysisType;
 use App\Enums\EmploymentType;
 use App\Enums\ExperienceLevel;
+use App\Enums\JobOrigin;
 use App\Enums\TrustAnalysisStatus;
 use App\Enums\WorkType;
 use App\Models\AiAnalysis;
@@ -235,5 +236,68 @@ class JobSearchTest extends TestCase
             ->assertStatus(422)
             ->assertJsonPath('success', false)
             ->assertJsonPath('message', 'Validation failed.');
+    }
+
+    #[Test]
+    public function default_search_excludes_foreign_and_unknown_jobs(): void
+    {
+        Job::factory()->published()->create([
+            'title' => 'Turkey Job',
+            'category' => 'turkey-scope-case',
+            'source' => JobOrigin::Scraped,
+            'city' => 'Istanbul',
+            'country' => 'Turkey',
+        ]);
+        Job::factory()->published()->create([
+            'title' => 'Foreign Job',
+            'category' => 'turkey-scope-case',
+            'source' => JobOrigin::Scraped,
+            'city' => 'Berlin',
+            'country' => 'Germany',
+        ]);
+        Job::factory()->published()->create([
+            'title' => 'Unknown Job',
+            'category' => 'turkey-scope-case',
+            'source' => JobOrigin::Scraped,
+            'city' => null,
+            'country' => null,
+            'work_type' => WorkType::Remote,
+        ]);
+
+        $this->getJson('/api/v1/jobs?category=turkey-scope-case')
+            ->assertOk()
+            ->assertJsonCount(1, 'data.items')
+            ->assertJsonPath('data.items.0.title', 'Turkey Job');
+    }
+
+    #[Test]
+    public function include_global_search_returns_foreign_and_unknown_jobs(): void
+    {
+        Job::factory()->published()->create([
+            'title' => 'Turkey Job Global Case',
+            'category' => 'turkey-scope-global-case',
+            'source' => JobOrigin::Scraped,
+            'city' => 'Ankara',
+            'country' => 'Turkey',
+        ]);
+        Job::factory()->published()->create([
+            'title' => 'Foreign Job Global Case',
+            'category' => 'turkey-scope-global-case',
+            'source' => JobOrigin::Scraped,
+            'city' => 'London',
+            'country' => 'UK',
+        ]);
+        Job::factory()->published()->create([
+            'title' => 'Unknown Job Global Case',
+            'category' => 'turkey-scope-global-case',
+            'source' => JobOrigin::Scraped,
+            'city' => null,
+            'country' => null,
+            'work_type' => WorkType::Remote,
+        ]);
+
+        $this->getJson('/api/v1/jobs?category=turkey-scope-global-case&include_global=1')
+            ->assertOk()
+            ->assertJsonCount(3, 'data.items');
     }
 }

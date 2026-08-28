@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useJob } from '@/hooks/useJob';
+import { useAuth } from '@/hooks/useAuth';
 import { useCanViewFitScore } from '@/hooks/useCanViewFitScore';
 import { Button } from '@/components/ui/Button';
 import { EmptyState, Skeleton } from '@/components/ui/States';
@@ -17,6 +18,8 @@ import { cn } from '@/utils/format';
 export function JobDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { data: job, isLoading, isError, refetch } = useJob(slug);
+  const { user } = useAuth();
+  const jobsHome = user?.role === 'company' ? '/company/jobs' : '/jobs';
   const showFitScore = useCanViewFitScore();
   const [activeTab, setActiveTab] = useState<DetailTab>('detail');
 
@@ -46,7 +49,7 @@ export function JobDetailPage() {
             <Button type="button" variant="outline" onClick={() => void refetch()}>
               Tekrar Dene
             </Button>
-            <Link to="/jobs">
+            <Link to={jobsHome}>
               <Button type="button">İlanlara Dön</Button>
             </Link>
           </div>
@@ -61,7 +64,7 @@ export function JobDetailPage() {
       <JobDetailHero job={job} showFitScore={showFitScore} />
 
       <div className="border-b border-surface">
-        <div className="flex gap-1 overflow-x-auto">
+        <div className="flex min-w-0 gap-1 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}

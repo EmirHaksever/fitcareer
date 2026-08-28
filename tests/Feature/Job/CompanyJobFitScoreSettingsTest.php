@@ -391,7 +391,7 @@ class CompanyJobFitScoreSettingsTest extends TestCase
     }
 
     #[Test]
-    public function job_list_queue_flow_uses_custom_weights(): void
+    public function job_list_uses_custom_weights_synchronously(): void
     {
         Queue::fake();
 
@@ -408,14 +408,9 @@ class CompanyJobFitScoreSettingsTest extends TestCase
         $this->withToken($token)
             ->getJson('/api/v1/jobs?category='.urlencode($category))
             ->assertOk()
-            ->assertJsonPath('data.items.0.fit_analysis_status', 'pending');
+            ->assertJsonPath('data.items.0.fit_analysis_status', 'completed');
 
-        Queue::assertPushed(AnalyzeCvJobFitJob::class, function (AnalyzeCvJobFitJob $queued) use ($profile, $job): bool {
-            return $queued->candidateProfileId === $profile->id && $queued->jobId === $job->id;
-        });
-
-        (new AnalyzeCvJobFitJob($profile->id, $job->id))
-            ->handle(app(CvJobFitAnalysisService::class));
+        Queue::assertNothingPushed();
 
         $analysis = AiAnalysis::query()->where('job_id', $job->id)->where('is_latest', true)->first();
         $this->assertSame('custom', $analysis->details['weight_source']);

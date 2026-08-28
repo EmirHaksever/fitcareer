@@ -1,0 +1,19 @@
+{
+    "name": "Stale Board Co",
+    "description": "Old posting",
+    "jobs": [
+        {
+            "title": "Legacy Engineer",
+            "shortcode": "STALE001",
+            "employment_type": "Full-time",
+            "telecommuting": false,
+            "department": "Engineering",
+            "url": "https://apply.workable.com/j/STALE001",
+            "published_on": "2020-01-01",
+            "country": "Turkey",
+            "city": "Istanbul",
+            "locations": [],
+            "description": "<p>Old role</p>"
+        }
+    ]
+}

@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\V1\Auth\LogoutController;
 use App\Http\Controllers\Api\V1\Auth\PasswordResetController;
 use App\Http\Controllers\Api\V1\Auth\PasswordUpdateController;
 use App\Http\Controllers\Api\V1\Auth\RegisterController;
+use App\Http\Controllers\Api\V1\Candidate\NotificationController;
+use App\Http\Controllers\Api\V1\Candidate\DashboardController;
 use App\Http\Controllers\Api\V1\Candidate\ApplicationController;
 use App\Http\Controllers\Api\V1\Candidate\CertificationController;
 use App\Http\Controllers\Api\V1\Candidate\CvController;
@@ -71,6 +73,8 @@ Route::prefix('v1')->group(function (): void {
     Route::prefix('candidate')
         ->middleware(['auth:sanctum', 'role:candidate'])
         ->group(function (): void {
+            Route::get('dashboard', [DashboardController::class, 'show']);
+
             Route::get('profile', [ProfileController::class, 'show']);
             Route::put('profile', [ProfileController::class, 'update']);
             Route::get('profile/photo', [ProfileController::class, 'showPhoto']);
@@ -115,6 +119,11 @@ Route::prefix('v1')->group(function (): void {
             Route::get('saved-jobs/ids', [SavedJobController::class, 'ids']);
             Route::post('saved-jobs/{job}', [SavedJobController::class, 'store']);
             Route::delete('saved-jobs/{job}', [SavedJobController::class, 'destroy']);
+
+            Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
+            Route::post('notifications/mark-all-read', [NotificationController::class, 'markAllRead']);
+            Route::patch('notifications/{notification}/read', [NotificationController::class, 'markRead']);
+            Route::get('notifications', [NotificationController::class, 'index']);
         });
 
     Route::prefix('company')

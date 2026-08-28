@@ -42,6 +42,7 @@ class CompanyJobResource extends JsonResource
             'trust_score' => $this->trust_score,
             'trust_label' => $this->trust_label->value,
             'trust_analysis_status' => $this->trust_analysis_status->value,
+            'applications_count' => $this->applications_count,
             'published_at' => $this->published_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),

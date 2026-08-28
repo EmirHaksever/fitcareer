@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Support\ResolvesCompany;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -112,9 +113,60 @@ class CompanyService
         }
 
         $company->verification_status = CompanyVerificationStatus::Pending;
+        $company->is_verified = false;
         $company->save();
 
         return $company->fresh();
+    }
+
+    public function findForVerification(string $identifier): Company
+    {
+        $query = Company::query();
+
+        if (ctype_digit($identifier)) {
+            $company = $query->find((int) $identifier);
+        } else {
+            $company = $query->where('slug', $identifier)->first();
+        }
+
+        if ($company === null) {
+            throw ValidationException::withMessages([
+                'company' => ['Company not found.'],
+            ]);
+        }
+
+        return $company;
+    }
+
+    public function applyOperationalVerification(Company $company, string $action): Company
+    {
+        $normalized = strtolower(trim($action));
+
+        if (! in_array($normalized, ['approve', 'reject'], true)) {
+            throw ValidationException::withMessages([
+                'action' => ['Action must be approve or reject.'],
+            ]);
+        }
+
+        if ($company->verification_status !== CompanyVerificationStatus::Pending) {
+            throw ValidationException::withMessages([
+                'verification_status' => ['Only pending verification requests can be approved or rejected.'],
+            ]);
+        }
+
+        return DB::transaction(function () use ($company, $normalized): Company {
+            if ($normalized === 'approve') {
+                $company->verification_status = CompanyVerificationStatus::Verified;
+                $company->is_verified = true;
+            } else {
+                $company->verification_status = CompanyVerificationStatus::Rejected;
+                $company->is_verified = false;
+            }
+
+            $company->save();
+
+            return $company->fresh();
+        });
     }
 
     private function generateUniqueSlug(string $name, int $ignoreCompanyId): string

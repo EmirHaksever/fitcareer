@@ -1,11 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { jobsApi } from '@/api/jobs';
 import type { JobListItem, JobSearchParams } from '@/types/api';
+import { isFitPending } from '@/utils/scores';
 
 function hasPendingFitScore(jobs: JobListItem[] | undefined): boolean {
-  return (jobs ?? []).some(
-    (job) => job.fit_analysis_status === 'pending' || job.fit_analysis_status === 'analyzing',
-  );
+  return (jobs ?? []).some((job) => isFitPending(job.fit_analysis_status));
 }
 
 export function useJobs(params: JobSearchParams = {}) {

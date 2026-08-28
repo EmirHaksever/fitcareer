@@ -30,7 +30,7 @@ export function ProfileCvImportBanner({
   onUpdated,
   onError,
 }: ProfileCvImportBannerProps) {
-  const { invalidate } = useCandidateProfileMutations();
+  const { invalidateProfileAndFit } = useCandidateProfileMutations();
   const [loading, setLoading] = useState(false);
 
   const parsedCv = cvMeta?.cv_parsed_data;
@@ -48,7 +48,7 @@ export function ProfileCvImportBanner({
     setLoading(true);
     try {
       const result = await applyCvImport(profile, parsedCv, { overwriteProfile });
-      await invalidate();
+      await invalidateProfileAndFit();
       onDismiss?.();
       onUpdated?.(
         result.warnings.length > 0

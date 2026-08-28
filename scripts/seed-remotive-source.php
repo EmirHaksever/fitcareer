@@ -22,6 +22,7 @@ $source = JobSource::query()->updateOrCreate(
             'limit' => 10,
             'max_listings' => 50,
             'refresh_interval_minutes' => 360,
+            'ingest_policy' => 'remote_open',
         ],
     ],
 );

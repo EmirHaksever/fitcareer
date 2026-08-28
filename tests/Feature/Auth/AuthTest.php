@@ -468,4 +468,35 @@ class AuthTest extends TestCase
 
         return $user->createToken('api-access')->plainTextToken;
     }
+
+    #[Test]
+    public function authenticated_user_can_update_password_with_valid_current_password(): void
+    {
+        $token = $this->authenticateUser();
+
+        $this->withToken($token)->putJson('/api/v1/auth/password', [
+            'current_password' => self::PASSWORD,
+            'password' => 'NewPassword123!',
+            'password_confirmation' => 'NewPassword123!',
+        ])->assertOk()
+            ->assertJsonPath('message', 'Password updated successfully.');
+
+        $user = User::query()->where('email', 'auth-user@example.com')->firstOrFail();
+        $this->assertTrue(Hash::check('NewPassword123!', $user->password));
+        $this->assertSame(0, $user->tokens()->count());
+    }
+
+    #[Test]
+    public function password_update_rejects_incorrect_current_password(): void
+    {
+        $token = $this->authenticateUser();
+
+        $this->withToken($token)->putJson('/api/v1/auth/password', [
+            'current_password' => 'WrongPassword123!',
+            'password' => 'NewPassword123!',
+            'password_confirmation' => 'NewPassword123!',
+        ])->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonStructure(['errors' => ['current_password']]);
+    }
 }

@@ -59,6 +59,7 @@ export interface CompanyJob {
   published_at: string | null;
   created_at: string | null;
   updated_at: string | null;
+  applications_count?: number;
   skills?: JobSkill[];
 }
 

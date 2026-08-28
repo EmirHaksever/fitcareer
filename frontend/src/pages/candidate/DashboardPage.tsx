@@ -1,11 +1,14 @@
 import { Link } from 'react-router-dom';
-import { getDashboardStatsPlaceholder } from '@/api/dashboard';
+import { TrustDistributionChart } from '@/components/dashboard/TrustDistributionChart';
 import { JobCard } from '@/components/jobs/JobCard';
 import { Button } from '@/components/ui/Button';
-import { Card, CardBody, CardHeader } from '@/components/ui/Card';
+import { Card, CardBody } from '@/components/ui/Card';
 import { EmptyState, Skeleton } from '@/components/ui/States';
 import { useAuth } from '@/hooks/useAuth';
-import { useJobs } from '@/hooks/useJobs';
+import { useCanViewFitScore } from '@/hooks/useCanViewFitScore';
+import { useDashboardStats } from '@/hooks/useDashboardStats';
+import { useSavedJobIds } from '@/hooks/useSavedJobs';
+import { mapDashboardStats } from '@/utils/dashboardStats';
 import { getFirstName } from '@/utils/format';
 
 const statToneClasses = {
@@ -17,8 +20,12 @@ const statToneClasses = {
 
 export function DashboardPage() {
   const { user } = useAuth();
-  const { data, isLoading, isError } = useJobs({ per_page: 4, sort: 'published_at' });
-  const stats = getDashboardStatsPlaceholder();
+  const showFitScore = useCanViewFitScore();
+  const { data, isLoading, isError, refetch } = useDashboardStats();
+  const { data: savedJobIds = [] } = useSavedJobIds();
+
+  const stats = data ? mapDashboardStats(data) : [];
+  const assistant = data?.career_assistant;
 
   return (
     <div className="space-y-8">
@@ -29,16 +36,30 @@ export function DashboardPage() {
         </p>
       </section>
 
+      {isError ? (
+        <EmptyState
+          title="Dashboard yüklenemedi"
+          description="Özet veriler şu anda getirilemedi."
+          action={
+            <Button type="button" variant="outline" onClick={() => void refetch()}>
+              Tekrar Dene
+            </Button>
+          }
+        />
+      ) : null}
+
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.id} className={statToneClasses[stat.tone]}>
-            <CardBody className="space-y-2">
-              <p className="text-sm font-medium">{stat.label}</p>
-              <p className="text-3xl font-bold">{stat.value}</p>
-              <p className="text-xs opacity-80">{stat.helper}</p>
-            </CardBody>
-          </Card>
-        ))}
+        {isLoading
+          ? Array.from({ length: 4 }).map((_, index) => <Skeleton key={index} className="h-28" />)
+          : stats.map((stat) => (
+              <Card key={stat.id} className={statToneClasses[stat.tone]}>
+                <CardBody className="space-y-2">
+                  <p className="text-sm font-medium">{stat.label}</p>
+                  <p className="text-3xl font-bold">{stat.value}</p>
+                  <p className="text-xs opacity-80">{stat.helper}</p>
+                </CardBody>
+              </Card>
+            ))}
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[2fr_1fr]">
@@ -57,51 +78,69 @@ export function DashboardPage() {
             </div>
           ) : null}
 
-          {isError ? (
+          {!isLoading && !isError && (data?.recommended_jobs.length ?? 0) === 0 ? (
             <EmptyState
-              title="İlanlar yüklenemedi"
-              description="İş ilanları şu anda getirilemedi. Lütfen daha sonra tekrar dene."
-            />
-          ) : null}
-
-          {!isLoading && !isError && data?.items.length === 0 ? (
-            <EmptyState
-              title="Henüz yayınlanmış ilan yok"
-              description="Yeni ilanlar eklendiğinde burada görünecek."
+              title="Henüz öneri yok"
+              description="CV profilini tamamlayıp ilanları inceledikçe öneriler burada görünecek."
               action={
-                <Link to="/jobs">
-                  <Button variant="outline">İş İlanlarına Göz At</Button>
+                <Link to="/profile?cv=1">
+                  <Button variant="outline">CV Profilime Git</Button>
                 </Link>
               }
             />
           ) : null}
 
           <div className="space-y-4">
-            {data?.items.map((job) => <JobCard key={job.id} job={job} />)}
+            {data?.recommended_jobs.map((job) => (
+              <JobCard
+                key={job.id}
+                job={job}
+                showFitScore={showFitScore}
+                isSaved={savedJobIds.includes(job.id)}
+                canSave={showFitScore}
+              />
+            ))}
           </div>
         </div>
 
         <div className="space-y-4">
           <Card>
-            <CardHeader>
+            <CardBody className="space-y-4">
               <h2 className="text-lg font-semibold text-ink">Piyasa Güvenilirlik Dağılımı</h2>
-            </CardHeader>
-            <CardBody>
-              <EmptyState
-                title="Grafik verisi bekleniyor"
-                description="TODO(mock): Dashboard analytics endpoint henüz backend'de yok."
-              />
+              {isLoading ? (
+                <Skeleton className="h-40" />
+              ) : (
+                <TrustDistributionChart
+                  buckets={data?.trust_distribution ?? []}
+                  totalJobs={data?.stats.total_jobs ?? 0}
+                />
+              )}
             </CardBody>
           </Card>
 
           <Card className="bg-gradient-to-br from-primary/5 to-secondary/5">
             <CardBody className="space-y-3">
               <h3 className="text-lg font-semibold text-ink">Kariyer İpucu</h3>
-              <p className="text-sm text-ink-muted">
-                CV profilini güncel tutarak Fit Score hesaplamalarının daha doğru olmasını sağlayabilirsin.
-              </p>
-              <Link to="/profile">
-                <Button variant="secondary">CV&apos;ni Analiz Et</Button>
+              {assistant?.has_cv && assistant.analyzed_job_count > 0 ? (
+                <p className="text-sm text-ink-muted">
+                  {assistant.analyzed_job_count} ilan için uyum analizin mevcut.
+                  {assistant.average_fit_score !== null ? (
+                    <>
+                      {' '}
+                      Ortalama uyum skorun{' '}
+                      <span className="font-semibold text-ink">%{assistant.average_fit_score}</span>.
+                    </>
+                  ) : null}
+                </p>
+              ) : (
+                <p className="text-sm text-ink-muted">
+                  CV profilini güncel tutarak Fit Score hesaplamalarının daha doğru olmasını sağlayabilirsin.
+                </p>
+              )}
+              <Link to={assistant?.has_cv ? '/fit-analysis' : '/profile?cv=1'}>
+                <Button variant="secondary">
+                  {assistant?.has_cv ? 'Uyum Analizini Gör' : "CV'ni Analiz Et"}
+                </Button>
               </Link>
             </CardBody>
           </Card>

@@ -48,6 +48,7 @@ class JobListResource extends JsonResource
                 'id' => $this->company?->id,
                 'name' => $this->company?->name,
                 'slug' => $this->company?->slug,
+                'is_verified' => (bool) $this->company?->is_verified,
             ]),
             'source_provider' => $this->whenLoaded('sourceProvider', fn () => $this->sourceProvider === null ? null : [
                 'id' => $this->sourceProvider->id,

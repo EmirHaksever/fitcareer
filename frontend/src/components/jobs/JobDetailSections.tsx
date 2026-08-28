@@ -9,9 +9,11 @@ import { JobDescriptionContent } from '@/components/jobs/JobDescriptionContent';
 import { JobMetaTag } from '@/components/jobs/JobMetaTag';
 import { JobSourceBadge } from '@/components/jobs/JobSourceBadge';
 import { ScoreSummaryCard } from '@/components/jobs/ScoreSummaryCard';
+import { TrustExplanationPanel } from '@/components/jobs/TrustExplanationPanel';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody } from '@/components/ui/Card';
 import type { JobDetail } from '@/types/api';
+import { isLikelyEnglishText } from '@/utils/detectTextLanguage';
 import {
   formatEmploymentType,
   formatExperienceLevel,
@@ -22,11 +24,14 @@ import {
   formatWorkType,
 } from '@/utils/format';
 import { isFitPending, isTrustPending } from '@/utils/scores';
+import { useAuth } from '@/hooks/useAuth';
 import {
   formatJobSourceLabel,
   getExternalJobUrl,
   getJobCompanyName,
   isExternalJob,
+  isInternalJob,
+  isVerifiedCompany,
   openExternalJobUrl,
 } from '@/utils/jobSource';
 
@@ -36,30 +41,6 @@ interface JobDetailContentProps {
   job: JobDetail;
   activeTab: DetailTab;
   showFitScore: boolean;
-}
-
-function BulletList({ content }: { content: string | null }) {
-  if (!content?.trim()) return null;
-
-  const items = content
-    .split(/\n+/)
-    .map((line) => line.replace(/^[-•*]\s*/, '').trim())
-    .filter(Boolean);
-
-  if (items.length <= 1) {
-    return <p className="whitespace-pre-wrap text-sm leading-7 text-ink-muted">{content}</p>;
-  }
-
-  return (
-    <ul className="space-y-2 text-sm leading-7 text-ink-muted">
-      {items.map((item) => (
-        <li key={item} className="flex gap-2">
-          <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
-          <span>{item}</span>
-        </li>
-      ))}
-    </ul>
-  );
 }
 
 function InsightCard({
@@ -130,17 +111,19 @@ function buildTrustInsights(job: JobDetail): string[] {
 
   if (isExternalJob(job)) {
     items.push(`Kaynak: ${formatJobSourceLabel(job)}.`);
+  } else if (isInternalJob(job)) {
+    items.push('Doğrudan işveren ilanı.');
   }
 
-  if (job.company?.is_verified) {
-    items.push('Şirket doğrulandı.');
-  } elseif (isExternalJob(job)) {
+  if (isVerifiedCompany(job)) {
+    items.push('Doğrulanmış şirket.');
+  } else if (isExternalJob(job)) {
     items.push('Dış kaynak ilanı; şirket doğrulaması FitCareer tarafından yapılmaz.');
   }
 
   if (isTrustPending(job.trust_analysis_status)) {
     items.push('Güvenilirlik analizi devam ediyor.');
-  } elseif (job.trust_score !== null) {
+  } else if (job.trust_score !== null) {
     items.push(`Güven skoru: %${job.trust_score} (${formatTrustLabel(job.trust_label)}).`);
   }
 
@@ -185,10 +168,15 @@ export function JobDetailContent({ job, activeTab, showFitScore }: JobDetailCont
                 </button>
               ) : null}
             </div>
-          ) : job.company?.is_verified ? (
-            <p className="text-sm text-primary">Doğrulanmış şirket</p>
           ) : (
-            <p className="text-sm text-ink-muted">Şirket doğrulama bilgisi mevcut değil</p>
+            <div className="space-y-2 text-sm text-ink-muted">
+              <p>Doğrudan işveren ilanı.</p>
+              {isVerifiedCompany(job) ? (
+                <p className="text-primary">Doğrulanmış şirket</p>
+              ) : (
+                <p>Bu şirket henüz FitCareer üzerinde doğrulanmadı.</p>
+              )}
+            </div>
           )}
         </CardBody>
       </Card>
@@ -229,8 +217,13 @@ export function JobDetailContent({ job, activeTab, showFitScore }: JobDetailCont
           <div className="flex justify-center sm:justify-start">
             <ScoreSummaryCard type="trust" score={job.trust_score} status={job.trust_analysis_status} />
           </div>
+
+          <TrustExplanationPanel job={job} />
+
           <ul className="space-y-3">
-            {buildTrustInsights(job).map((item) => (
+            {buildTrustInsights(job)
+              .filter((item) => !item.includes('Güven skoru:'))
+              .map((item) => (
               <li key={item} className="flex items-start gap-2.5 text-sm text-ink-muted">
                 <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
                 <span>{item}</span>
@@ -247,6 +240,12 @@ export function JobDetailContent({ job, activeTab, showFitScore }: JobDetailCont
       <CardBody className="space-y-8">
         <section className="space-y-3">
           <h2 className="text-lg font-semibold text-ink">İş Tanımı</h2>
+          {isLikelyEnglishText(job.description) ? (
+            <p className="rounded-lg border border-surface bg-background px-3 py-2 text-xs text-ink-muted">
+              İlan açıklaması kaynak tarafından İngilizce sağlanmıştır. Metin orijinal haliyle
+              gösterilmektedir.
+            </p>
+          ) : null}
           <JobDescriptionContent content={job.description} />
         </section>
 
@@ -280,6 +279,8 @@ export function JobDetailSidebar({
   showFitScore: boolean;
 }) {
   const [applyOpen, setApplyOpen] = useState(false);
+  const { user } = useAuth();
+  const canApply = user?.role === 'candidate';
   const fitInsights = buildFitInsights(job, showFitScore);
   const externalUrl = getExternalJobUrl(job);
   const externalJob = isExternalJob(job);
@@ -301,26 +302,28 @@ export function JobDetailSidebar({
         onAction={onShowTrust}
       />
 
-      <Card>
-        <CardBody className="space-y-3">
-          {externalJob && externalUrl ? (
-            <Button className="w-full" onClick={() => openExternalJobUrl(externalUrl)}>
-              İlana Git
-            </Button>
-          ) : (
-            <Button className="w-full" onClick={() => setApplyOpen(true)}>
-              Başvur
-            </Button>
-          )}
-          <p className="text-center text-xs text-ink-subtle">
-            {externalJob
-              ? `${formatJobSourceLabel(job)} üzerindeki orijinal ilana yönlendirileceksiniz.`
-              : 'Başvurunu göndermeden önce profilini güncel tutmanı öneririz.'}
-          </p>
-        </CardBody>
-      </Card>
+      {canApply || (externalJob && externalUrl) ? (
+        <Card>
+          <CardBody className="space-y-3">
+            {externalJob && externalUrl ? (
+              <Button className="w-full" onClick={() => openExternalJobUrl(externalUrl)}>
+                İlana Git
+              </Button>
+            ) : (
+              <Button className="w-full" onClick={() => setApplyOpen(true)}>
+                Başvur
+              </Button>
+            )}
+            <p className="text-center text-xs text-ink-subtle">
+              {externalJob
+                ? `${formatJobSourceLabel(job)} üzerindeki orijinal ilana yönlendirileceksiniz.`
+                : 'Başvurunu göndermeden önce profilini güncel tutmanı öneririz.'}
+            </p>
+          </CardBody>
+        </Card>
+      ) : null}
 
-      {!externalJob ? (
+      {canApply && !externalJob ? (
         <ApplyJobModal
           jobId={job.id}
           jobTitle={job.title}
@@ -359,6 +362,9 @@ export function JobDetailHero({
 
             <div className="flex flex-wrap items-center gap-2">
               <JobSourceBadge job={job} prominent />
+              {isVerifiedCompany(job) ? (
+                <JobMetaTag className="text-primary">Doğrulanmış şirket</JobMetaTag>
+              ) : null}
               <JobMetaTag>{formatWorkType(job.work_type)}</JobMetaTag>
               <JobMetaTag>{formatEmploymentType(job.employment_type)}</JobMetaTag>
               <JobMetaTag>{formatLocation(job.city, job.country)}</JobMetaTag>
@@ -382,13 +388,16 @@ export function JobDetailHero({
 
 export function JobDetailBreadcrumb({ title }: { title: string }) {
   const location = useLocation();
+  const { user } = useAuth();
   const jobsListSearch =
     (location.state as { jobsListSearch?: string } | null)?.jobsListSearch ?? '';
+  const jobsHref = user?.role === 'company' ? '/company/jobs' : `/jobs${jobsListSearch}`;
+  const jobsLabel = user?.role === 'company' ? 'İlanlarım' : 'İş İlanları';
 
   return (
     <nav className="flex items-center gap-1.5 text-sm text-ink-muted" aria-label="Breadcrumb">
-      <Link to={`/jobs${jobsListSearch}`} className="font-medium transition hover:text-primary">
-        İş İlanları
+      <Link to={jobsHref} className="font-medium transition hover:text-primary">
+        {jobsLabel}
       </Link>
       <ChevronRight className="h-4 w-4" aria-hidden="true" />
       <span className="truncate font-medium text-ink">{title}</span>

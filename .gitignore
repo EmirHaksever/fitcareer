@@ -41,3 +41,17 @@ Thumbs.db
 /*.webp
 /frontend/auth-*.png
 /frontend/landing-*.png
+
+# Internal audits, discovery dumps, personal samples — never publish
+/docs/internal/
+/scripts/cv-sample.json
+/storage/app/kariyer-detail-sample.html
+/storage/framework/testing/*.docx
+/storage/backfill-snapshots/
+/storage/ghost-observations/
+/storage/phase-*/
+/storage/**/*.json
+/storage/**/*.html
+/storage/**/*.md
+!/storage/api-docs/api-docs.json
+!/storage/**/.gitignore

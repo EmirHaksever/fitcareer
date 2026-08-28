@@ -11,6 +11,7 @@ import { EmptyState } from '@/components/ui/States';
 import { ProfileSectionCard } from '@/components/profile/ProfileSectionCard';
 import { PROFICIENCY_OPTIONS, selectClassName } from '@/components/profile/profileFormOptions';
 import { CANDIDATE_PROFILE_KEY } from '@/hooks/useCandidateProfile';
+import { invalidateFitRelatedQueries } from '@/hooks/invalidateFitQueries';
 import type { AttachSkillPayload, CandidateSkill, ProficiencyLevel, UpdateSkillPayload } from '@/types/candidate';
 import { formatProficiencyLevel } from '@/utils/format';
 import { sanitizePayload } from '@/utils/payload';
@@ -49,7 +50,10 @@ export function ProfileSkillsSection({ skills, onUpdated, onError }: Props) {
     [catalog, skills, editing],
   );
 
-  const invalidate = () => void queryClient.invalidateQueries({ queryKey: CANDIDATE_PROFILE_KEY });
+  const invalidate = () => {
+    void queryClient.invalidateQueries({ queryKey: CANDIDATE_PROFILE_KEY });
+    invalidateFitRelatedQueries(queryClient);
+  };
 
   const saveMutation = useMutation({
     mutationFn: () => {

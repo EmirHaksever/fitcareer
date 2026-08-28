@@ -55,4 +55,13 @@ export const authApi = {
     const { data } = await apiClient.post<ApiResponse<null>>('/auth/reset-password', payload);
     return data.message;
   },
+
+  async updatePassword(payload: {
+    current_password: string;
+    password: string;
+    password_confirmation: string;
+  }): Promise<string> {
+    const { data } = await apiClient.put<ApiResponse<null>>('/auth/password', payload);
+    return data.message;
+  },
 };

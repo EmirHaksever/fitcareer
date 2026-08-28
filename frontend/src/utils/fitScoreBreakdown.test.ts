@@ -51,23 +51,18 @@ describe('fitScoreBreakdown', () => {
   });
 
   it('shows fit badge for candidate with score', () => {
-    expect(shouldShowFitScoreBadge(true, 82, 'completed')).toBe(true);
+    expect(shouldShowFitScoreBadge(true)).toBe(true);
   });
 
-  it('shows fit badge while analysis is pending', () => {
-    expect(shouldShowFitScoreBadge(true, null, 'pending')).toBe(true);
+  it('shows fit badge for candidate while analysis is pending', () => {
+    expect(shouldShowFitScoreBadge(true)).toBe(true);
   });
 
   it('hides fit badge for guest even with score in payload', () => {
-    expect(shouldShowFitScoreBadge(false, 82, 'completed')).toBe(false);
+    expect(shouldShowFitScoreBadge(false)).toBe(false);
   });
 
   it('hides fit badge for company users', () => {
-    expect(shouldShowFitScoreBadge(false, 90, 'completed')).toBe(false);
-  });
-
-  it('does not force empty badge when score is null and not pending', () => {
-    expect(shouldShowFitScoreBadge(true, null, 'completed')).toBe(false);
-    expect(shouldShowFitScoreBadge(true, null, null)).toBe(false);
+    expect(shouldShowFitScoreBadge(false)).toBe(false);
   });
 });

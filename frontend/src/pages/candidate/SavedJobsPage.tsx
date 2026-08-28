@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { JobList } from '@/components/jobs/JobList';
 import { Button } from '@/components/ui/Button';
 import { EmptyState, Skeleton } from '@/components/ui/States';
@@ -36,6 +37,27 @@ export function SavedJobsPage() {
 
   const pagination = data?.pagination;
   const savedIds = (data?.items ?? []).map((job) => job.id);
+  const isEmpty = (pagination?.total ?? 0) === 0;
+
+  if (isEmpty) {
+    return (
+      <div className="space-y-5">
+        <header className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">Kaydedilen İlanlar</h1>
+          <p className="text-sm text-ink-muted">Henüz kayıtlı ilan yok.</p>
+        </header>
+        <EmptyState
+          title="Kayıtlı ilan bulunmuyor"
+          description="İlan detayında veya listede kaydet butonuna basarak ilgini çeken ilanları burada toplayabilirsin."
+          action={
+            <Link to="/jobs">
+              <Button>İlanları Keşfet</Button>
+            </Link>
+          }
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">

@@ -56,6 +56,7 @@ export interface JobListItem {
     id: number;
     name: string;
     slug: string;
+    is_verified?: boolean;
   } | null;
   trust_score: number | null;
   trust_label: string;
@@ -124,4 +125,59 @@ export interface DashboardStat {
   value: string;
   helper: string;
   tone: 'primary' | 'warning' | 'neutral' | 'success';
+}
+
+export interface DashboardTrustBucket {
+  id: string;
+  label: string;
+  count: number;
+  percentage: number;
+}
+
+export interface DashboardData {
+  stats: {
+    total_jobs: number;
+    trusted_jobs: number;
+    suspicious_jobs: number;
+    application_count: number;
+    average_fit_score: number | null;
+    analyzed_job_count: number;
+    has_cv: boolean;
+    profile_strength_score: number | null;
+  };
+  trust_distribution: DashboardTrustBucket[];
+  recommended_jobs: JobListItem[];
+  analyzed_jobs: JobListItem[];
+  career_assistant: {
+    has_cv: boolean;
+    average_fit_score: number | null;
+    analyzed_job_count: number;
+  };
+}
+
+export type NotificationCategory = 'job_match' | 'application_update' | 'system' | 'promotion';
+
+export interface CandidateNotification {
+  id: string;
+  category: NotificationCategory;
+  title: string;
+  body: string;
+  action_path: string | null;
+  is_read: boolean;
+  read_at: string | null;
+  created_at: string;
+}
+
+export interface PaginatedNotifications {
+  items: CandidateNotification[];
+  pagination: {
+    current_page: number;
+    per_page: number;
+    total: number;
+    last_page: number;
+  };
+}
+
+export interface NotificationUnreadCount {
+  unread_count: number;
 }

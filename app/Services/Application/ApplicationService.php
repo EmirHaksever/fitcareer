@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Services\Application;
 
 use App\Enums\AiAnalysisStatus;
+use App\Enums\AiAnalysisType;
 use App\Enums\ApplicationStatus;
 use App\Enums\JobOrigin;
 use App\Enums\JobStatus;
+use App\Http\Requests\Company\ListApplicationsRequest;
 use App\Events\ApplicationStatusChanged;
 use App\Exceptions\InvalidStatusTransitionException;
 use App\Models\Application;
@@ -20,6 +22,7 @@ use App\Support\JobScorePresenter;
 use App\Support\ResolvesCandidateProfile;
 use App\Support\ResolvesCompany;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -68,7 +71,9 @@ class ApplicationService
     private function companyApplicationRelations(): array
     {
         return [
-            'job',
+            'job.analyses' => fn ($query) => $query
+                ->where('type', AiAnalysisType::CvJobFit)
+                ->where('is_latest', true),
             'candidateProfile.user',
             'statusHistory' => fn ($query) => $query->orderBy('created_at'),
         ];
@@ -83,19 +88,46 @@ class ApplicationService
         int $perPage = 15,
         ?int $jobId = null,
         ?ApplicationStatus $status = null,
+        string $sort = ListApplicationsRequest::SORT_ATTENTION,
     ): LengthAwarePaginator {
         $company = $this->resolveCompany($user);
 
-        return Application::query()
+        $query = Application::query()
             ->whereHas('job', function ($query) use ($company): void {
                 $query->where('company_id', $company->id)
                     ->where('source', JobOrigin::Internal);
             })
             ->when($jobId !== null, fn ($query) => $query->where('job_id', $jobId))
             ->when($status !== null, fn ($query) => $query->where('status', $status))
-            ->with($this->companyApplicationRelations())
-            ->orderByDesc('applied_at')
-            ->paginate(perPage: $perPage, page: $page);
+            ->with($this->companyApplicationRelations());
+
+        $this->applyCompanyListSort($query, $sort);
+
+        return $query->paginate(perPage: $perPage, page: $page);
+    }
+
+    /**
+     * @param  Builder<Application>  $query
+     */
+    private function applyCompanyListSort(Builder $query, string $sort): void
+    {
+        match ($sort) {
+            ListApplicationsRequest::SORT_MATCH_SCORE_DESC => $query
+                ->orderByRaw('match_score IS NULL')
+                ->orderByDesc('match_score')
+                ->orderByDesc('applied_at'),
+            ListApplicationsRequest::SORT_MATCH_SCORE_ASC => $query
+                ->orderByRaw('match_score IS NULL')
+                ->orderBy('match_score')
+                ->orderByDesc('applied_at'),
+            ListApplicationsRequest::SORT_APPLIED_AT_ASC => $query->orderBy('applied_at'),
+            ListApplicationsRequest::SORT_APPLIED_AT_DESC => $query->orderByDesc('applied_at'),
+            default => $query
+                ->orderByRaw("CASE WHEN status IN ('submitted', 'under_review') THEN 0 ELSE 1 END")
+                ->orderByRaw('match_score IS NULL')
+                ->orderByDesc('match_score')
+                ->orderByDesc('applied_at'),
+        };
     }
 
     public function getForCompany(User $user, int $applicationId): Application

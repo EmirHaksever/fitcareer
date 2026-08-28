@@ -1,0 +1,31 @@
+{
+    "apiVersion": "1",
+    "jobs": [
+        {
+            "id": "3f5c2489-d889-4783-b846-70f04d274094",
+            "title": "Growth Manager, Learna",
+            "department": "Growth",
+            "team": "Growth",
+            "employmentType": "FullTime",
+            "location": "Istanbul",
+            "secondaryLocations": [],
+            "publishedAt": "2026-07-06T05:01:11.319+00:00",
+            "isListed": true,
+            "isRemote": true,
+            "workplaceType": "Hybrid",
+            "address": {
+                "postalAddress": {
+                    "postalCode": "34394",
+                    "addressRegion": "Şişli",
+                    "streetAddress": "Ferko Signature Building",
+                    "addressCountry": "Turkey",
+                    "addressLocality": "Istanbul"
+                }
+            },
+            "jobUrl": "https://jobs.ashbyhq.com/codeway/3f5c2489-d889-4783-b846-70f04d274094",
+            "applyUrl": "https://jobs.ashbyhq.com/codeway/3f5c2489-d889-4783-b846-70f04d274094/application",
+            "descriptionHtml": "<p>Build growth campaigns for <strong>Learna</strong>.</p>",
+            "descriptionPlain": "Build growth campaigns for Learna."
+        }
+    ]
+}

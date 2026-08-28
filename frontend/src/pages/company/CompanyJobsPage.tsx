@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BriefcaseBusiness, ClipboardList, Plus } from 'lucide-react';
+import { BriefcaseBusiness, ClipboardList, ExternalLink, Plus } from 'lucide-react';
 import { JOB_STATUS_LABELS } from '@/components/company-jobs/jobFormOptions';
 import { JobMetaTag } from '@/components/jobs/JobMetaTag';
 import { Button } from '@/components/ui/Button';
@@ -12,6 +12,7 @@ import {
   formatWorkType,
 } from '@/utils/format';
 import { formatApplicationDate } from '@/utils/applicationStatus';
+import { companyPublicJobPath } from '@/utils/companyPortal';
 
 export function CompanyJobsPage() {
   const { data, isLoading, isError, refetch } = useCompanyJobs({ per_page: 50 });
@@ -71,8 +72,11 @@ export function CompanyJobsPage() {
       {!isLoading && !isError && jobs.length > 0 ? (
         <div className="space-y-3">
           <p className="text-sm text-ink-muted">{total.toLocaleString('tr-TR')} ilan listeleniyor</p>
-          {jobs.map((job) => (
-            <Card key={job.id} className="transition hover:border-primary/20">
+          {jobs.map((job) => {
+            const listingPath = companyPublicJobPath(job.status, job.slug);
+
+            return (
+              <Card key={job.id} className="transition hover:border-primary/20">
               <CardBody className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
                 <div className="min-w-0 space-y-2">
                   <div className="flex flex-wrap items-center gap-2">
@@ -96,6 +100,14 @@ export function CompanyJobsPage() {
                 </div>
 
                 <div className="flex flex-wrap gap-2">
+                  {listingPath ? (
+                    <Link to={listingPath}>
+                      <Button type="button" variant="outline" size="sm">
+                        <ExternalLink className="h-4 w-4" aria-hidden="true" />
+                        İlanı Görüntüle
+                      </Button>
+                    </Link>
+                  ) : null}
                   {job.status === 'draft' ? (
                     <Link to={`/company/jobs/${job.id}/edit`}>
                       <Button type="button" variant="outline" size="sm">
@@ -113,7 +125,8 @@ export function CompanyJobsPage() {
                 </div>
               </CardBody>
             </Card>
-          ))}
+            );
+          })}
         </div>
       ) : null}
     </div>

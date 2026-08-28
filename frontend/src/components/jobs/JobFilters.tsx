@@ -102,7 +102,7 @@ function FiltersForm({ values, onChange, onReset }: Omit<JobFiltersProps, 'class
       </FilterField>
 
       <Input
-        label="Minimum Trust Score"
+        label="En düşük güven skoru"
         name="min_trust_score"
         type="number"
         min={0}
@@ -118,7 +118,7 @@ function FiltersForm({ values, onChange, onReset }: Omit<JobFiltersProps, 'class
       />
 
       <Input
-        label="Minimum Fit Score"
+        label="En düşük uyum skoru"
         name="min_fit_score"
         type="number"
         min={0}

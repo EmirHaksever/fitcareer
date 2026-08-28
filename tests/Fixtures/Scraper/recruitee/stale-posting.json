@@ -1,0 +1,23 @@
+{
+    "offers": [
+        {
+            "id": 9999001,
+            "slug": "stale-role",
+            "title": "Stale Role",
+            "description": "<p>Old posting.</p>",
+            "country": "Türkiye",
+            "country_code": "TR",
+            "city": "İstanbul",
+            "location": "İstanbul, İstanbul, Türkiye",
+            "remote": false,
+            "hybrid": false,
+            "on_site": true,
+            "employment_type_code": "fulltime_permanent",
+            "published_at": "2023-01-01 00:00:00 UTC",
+            "updated_at": "2023-01-02 00:00:00 UTC",
+            "careers_url": "https://example.recruitee.com/o/stale-role",
+            "careers_apply_url": "https://example.recruitee.com/o/stale-role/c/new",
+            "status": "published"
+        }
+    ]
+}

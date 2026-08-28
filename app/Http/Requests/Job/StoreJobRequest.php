@@ -8,6 +8,7 @@ use App\Enums\EmploymentType;
 use App\Enums\ExperienceLevel;
 use App\Enums\WorkType;
 use App\Http\Requests\ApiFormRequest;
+use App\Services\Job\InternalJobQualityGate;
 use Illuminate\Validation\Rule;
 
 class StoreJobRequest extends ApiFormRequest
@@ -32,7 +33,7 @@ class StoreJobRequest extends ApiFormRequest
             'work_type' => ['required', Rule::enum(WorkType::class)],
             'experience_level' => ['sometimes', 'nullable', Rule::enum(ExperienceLevel::class)],
             'city' => ['sometimes', 'nullable', 'string', 'max:255'],
-            'country' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'country' => ['required', 'string', 'max:255'],
             'salary_min' => ['sometimes', 'nullable', 'numeric', 'min:0'],
             'salary_max' => ['sometimes', 'nullable', 'numeric', 'min:0', 'gte:salary_min'],
             'salary_currency' => ['sometimes', 'nullable', 'string', 'size:3'],
@@ -50,5 +51,18 @@ class StoreJobRequest extends ApiFormRequest
             'trust_analysis_status' => ['prohibited'],
             'slug' => ['prohibited'],
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator): void {
+            foreach (InternalJobQualityGate::validatePayload($this->all()) as $field => $messages) {
+                foreach ($messages as $message) {
+                    if (! $validator->errors()->has($field)) {
+                        $validator->errors()->add($field, $message);
+                    }
+                }
+            }
+        });
     }
 }

@@ -1,0 +1,33 @@
+{
+    "offers": [
+        {
+            "id": 2706848,
+            "slug": "senior-financial-analyst-fpa",
+            "title": "Senior Financial Analyst (FP&A)",
+            "description": "<p>Build financial models for Mikro Yazılım.</p>",
+            "country": "Türkiye",
+            "country_code": "TR",
+            "city": "İstanbul",
+            "location": "İstanbul, İstanbul, Türkiye",
+            "locations": [
+                {
+                    "city": "İstanbul",
+                    "country": "Türkiye",
+                    "country_code": "TR"
+                }
+            ],
+            "remote": false,
+            "hybrid": true,
+            "on_site": false,
+            "employment_type_code": "fulltime_permanent",
+            "category_code": "finance",
+            "published_at": "2026-08-11 10:00:00 UTC",
+            "created_at": "2026-08-10 09:00:00 UTC",
+            "updated_at": "2026-08-12 11:00:00 UTC",
+            "careers_url": "https://mikroyazilim.recruitee.com/o/senior-financial-analyst-fpa",
+            "careers_apply_url": "https://mikroyazilim.recruitee.com/o/senior-financial-analyst-fpa/c/new",
+            "company_name": "Mikro Yazılım",
+            "status": "published"
+        }
+    ]
+}

@@ -21,6 +21,8 @@ class Notification extends DatabaseNotification
     {
         return [
             'category' => NotificationCategory::class,
+            'data' => 'array',
+            'read_at' => 'datetime',
         ];
     }
 }

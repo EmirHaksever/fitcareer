@@ -10,12 +10,13 @@ export interface JobSourceFields {
   source_provider?: JobSourceProvider | null;
   company?: {
     name?: string;
+    is_verified?: boolean;
   } | null;
   external_url?: string | null;
 }
 
 const SOURCE_LABELS: Record<string, string> = {
-  internal: 'FitCareer',
+  internal: 'Doğrudan işveren ilanı',
   'kariyer.net': 'Kariyer.net',
   'kariyer-net': 'Kariyer.net',
   remotive: 'Remotive',
@@ -61,8 +62,8 @@ export function formatJobSourceLabel(job: JobSourceFields): string {
 export function formatJobSourceBadgeLabel(job: JobSourceFields): string {
   const label = formatJobSourceLabel(job);
 
-  if (label === 'FitCareer') {
-    return 'FITCAREER';
+  if (label === 'Doğrudan işveren ilanı') {
+    return 'DOĞRUDAN İŞVEREN İLANI';
   }
 
   if (label === 'Dış Kaynak') {
@@ -70,6 +71,10 @@ export function formatJobSourceBadgeLabel(job: JobSourceFields): string {
   }
 
   return label.toUpperCase();
+}
+
+export function isVerifiedCompany(job: Pick<JobSourceFields, 'company'>): boolean {
+  return job.company?.is_verified === true;
 }
 
 export function isInternalJob(job: Pick<JobSourceFields, 'source'>): boolean {

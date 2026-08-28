@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { candidateProfileApi } from '@/api/candidate/profile';
 import type { UpdateCandidateProfilePayload } from '@/types/candidate';
+import { invalidateFitRelatedQueries } from '@/hooks/invalidateFitQueries';
 
 export const CANDIDATE_PROFILE_KEY = ['candidate', 'profile'] as const;
 export const CANDIDATE_CV_KEY = ['candidate', 'cv'] as const;
@@ -22,34 +23,39 @@ export function useCandidateCv() {
 export function useCandidateProfileMutations() {
   const queryClient = useQueryClient();
 
-  const invalidate = () => {
+  const invalidateProfile = () => {
     void queryClient.invalidateQueries({ queryKey: CANDIDATE_PROFILE_KEY });
     void queryClient.invalidateQueries({ queryKey: CANDIDATE_CV_KEY });
   };
 
+  const invalidateProfileAndFit = () => {
+    invalidateProfile();
+    invalidateFitRelatedQueries(queryClient);
+  };
+
   const updateProfile = useMutation({
     mutationFn: (payload: UpdateCandidateProfilePayload) => candidateProfileApi.update(payload),
-    onSuccess: invalidate,
+    onSuccess: invalidateProfileAndFit,
   });
 
   const uploadPhoto = useMutation({
     mutationFn: (file: File) => candidateProfileApi.uploadPhoto(file),
-    onSuccess: invalidate,
+    onSuccess: invalidateProfile,
   });
 
   const deletePhoto = useMutation({
     mutationFn: () => candidateProfileApi.deletePhoto(),
-    onSuccess: invalidate,
+    onSuccess: invalidateProfile,
   });
 
   const uploadCv = useMutation({
     mutationFn: (file: File) => candidateProfileApi.uploadCv(file),
-    onSuccess: invalidate,
+    onSuccess: invalidateProfileAndFit,
   });
 
   const deleteCv = useMutation({
     mutationFn: () => candidateProfileApi.deleteCv(),
-    onSuccess: invalidate,
+    onSuccess: invalidateProfileAndFit,
   });
 
   return {
@@ -58,6 +64,7 @@ export function useCandidateProfileMutations() {
     deletePhoto,
     uploadCv,
     deleteCv,
-    invalidate,
+    invalidateProfile,
+    invalidateProfileAndFit,
   };
 }

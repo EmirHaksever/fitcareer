@@ -1,0 +1,14 @@
+[
+    {
+        "id": "stale-job-001",
+        "text": "Legacy Role",
+        "descriptionPlain": "Very old posting.",
+        "hostedUrl": "https://jobs.lever.co/commencis/stale-job-001",
+        "createdAt": 1507388405000,
+        "workplaceType": "onsite",
+        "categories": {
+            "location": "Istanbul, Turkey",
+            "commitment": "Full-time"
+        }
+    }
+]

@@ -2,7 +2,13 @@ import { useState, type FormEvent } from 'react';
 import { Lock, Mail } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { authApi } from '@/api/auth';
-import { getApiErrorMessage, getValidationErrors } from '@/api/client';
+import { getValidationErrors } from '@/api/client';
+import {
+  mapAuthFieldErrors,
+  resolveNetworkErrorMessage,
+  resolveResetPasswordError,
+  translateAuthApiMessage,
+} from '@/utils/authValidationMessages';
 import { AuthFormCard } from '@/components/auth/AuthFormCard';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -33,15 +39,22 @@ export function ResetPasswordPage() {
         password,
         password_confirmation: passwordConfirmation,
       });
-      setMessage(responseMessage);
+      setMessage(translateAuthApiMessage(responseMessage));
     } catch (submitError) {
       const validation = getValidationErrors(submitError);
-      setFieldErrors({
-        email: validation.email?.[0] ?? '',
-        token: validation.token?.[0] ?? '',
-        password: validation.password?.[0] ?? '',
-      });
-      setError(getApiErrorMessage(submitError));
+      const mapped = mapAuthFieldErrors(
+        validation,
+        ['email', 'token', 'password', 'password_confirmation'],
+        'reset_password',
+      );
+      setFieldErrors(mapped);
+      const hasFieldErrors = Object.values(mapped).some(Boolean);
+      setError(
+        hasFieldErrors
+          ? null
+          : resolveNetworkErrorMessage(submitError) ||
+              resolveResetPasswordError(validation, ''),
+      );
     } finally {
       setLoading(false);
     }
@@ -69,7 +82,7 @@ export function ResetPasswordPage() {
             required
           />
           <Input
-            label="Token"
+            label="Sıfırlama kodu"
             name="token"
             value={token}
             onChange={(event) => setToken(event.target.value)}

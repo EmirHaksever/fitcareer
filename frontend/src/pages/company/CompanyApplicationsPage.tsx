@@ -2,17 +2,26 @@ import { useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { CompanyApplicationCard } from '@/components/company-applications/CompanyApplicationCard';
 import { CompanyApplicationStatusBadge } from '@/components/company-applications/CompanyApplicationStatusBadge';
+import { MatchScoreDisplay } from '@/components/company-applications/MatchScoreDisplay';
 import { JobCompanyAvatar } from '@/components/jobs/JobCompanyAvatar';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody } from '@/components/ui/Card';
 import { EmptyState, Skeleton } from '@/components/ui/States';
 import { useCompanyApplications, useCompanyJobsForFilter } from '@/hooks/useCompanyApplications';
 import type { ApplicationStatus } from '@/types/application';
-import type { CompanyApplication } from '@/types/companyApplication';
+import type { CompanyApplication, CompanyApplicationSort } from '@/types/companyApplication';
 import { APPLICATION_STATUS_LABELS, formatApplicationDate, formatApplicationScore } from '@/utils/applicationStatus';
 import { cn, formatLocation } from '@/utils/format';
 
 const DEFAULT_PER_PAGE = 10;
+
+const SORT_OPTIONS: CompanyApplicationSort[] = [
+  'attention',
+  'match_score_desc',
+  'match_score_asc',
+  'applied_at_desc',
+  'applied_at_asc',
+];
 
 function CompanyApplicationTableRow({ application }: { application: CompanyApplication }) {
   const candidateName = application.candidate?.user?.name ?? 'Aday';
@@ -32,7 +41,13 @@ function CompanyApplicationTableRow({ application }: { application: CompanyAppli
         </Link>
       </td>
       <td className="px-4 py-4 text-sm text-ink">{application.job?.title ?? '—'}</td>
-      <td className="px-4 py-4 text-sm text-ink">{formatApplicationScore(application.match_score)}</td>
+      <td className="px-4 py-4">
+        <MatchScoreDisplay
+          score={application.match_score}
+          status={application.match_analysis_status}
+          variant="compact"
+        />
+      </td>
       <td className="px-4 py-4 text-sm text-ink">{formatApplicationScore(application.trust_score)}</td>
       <td className="px-4 py-4 text-sm text-ink-muted">{formatApplicationDate(application.applied_at)}</td>
       <td className="px-4 py-4">
@@ -57,6 +72,10 @@ export function CompanyApplicationsPage() {
   const perPage = Number(searchParams.get('per_page') ?? String(DEFAULT_PER_PAGE));
   const jobId = searchParams.get('job_id');
   const status = searchParams.get('status');
+  const rawSort = searchParams.get('sort');
+  const sort: CompanyApplicationSort = SORT_OPTIONS.includes(rawSort as CompanyApplicationSort)
+    ? (rawSort as CompanyApplicationSort)
+    : 'attention';
 
   const queryParams = useMemo(
     () => ({
@@ -64,8 +83,9 @@ export function CompanyApplicationsPage() {
       per_page: Number.isFinite(perPage) && perPage > 0 ? perPage : DEFAULT_PER_PAGE,
       job_id: jobId ? Number(jobId) : undefined,
       status: (status as ApplicationStatus | null) || undefined,
+      sort,
     }),
-    [page, perPage, jobId, status],
+    [page, perPage, jobId, status, sort],
   );
 
   const { data, isLoading, isError, refetch } = useCompanyApplications(queryParams);
@@ -140,6 +160,21 @@ export function CompanyApplicationsPage() {
                   {label}
                 </option>
               ))}
+            </select>
+          </label>
+
+          <label className="block space-y-2">
+            <span className="text-sm font-medium text-ink">Sıralama</span>
+            <select
+              value={sort}
+              onChange={(event) => updateParams({ sort: event.target.value || undefined })}
+              className={selectClassName}
+            >
+              <option value="attention">İnceleme önceliği</option>
+              <option value="match_score_desc">En yüksek uyum</option>
+              <option value="match_score_asc">En düşük uyum</option>
+              <option value="applied_at_desc">En yeni başvuru</option>
+              <option value="applied_at_asc">En eski başvuru</option>
             </select>
           </label>
         </CardBody>

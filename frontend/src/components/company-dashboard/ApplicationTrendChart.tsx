@@ -20,7 +20,7 @@ export function ApplicationTrendChart({ points, className }: ApplicationTrendCha
         </div>
       </div>
 
-      <div className="flex h-40 items-end gap-1.5">
+      <div className="flex h-28 items-end gap-1.5">
         {points.map((point) => {
           const height = point.count === 0 ? 4 : Math.max(12, (point.count / maxCount) * 100);
 
