@@ -43,6 +43,12 @@ class JobPolicy
             && $job->status === JobStatus::Draft;
     }
 
+    public function unpublish(User $user, Job $job): bool
+    {
+        return $this->ownsInternalJob($user, $job)
+            && $job->status === JobStatus::Published;
+    }
+
     public function manageSkills(User $user, Job $job): bool
     {
         return $this->ownsInternalJob($user, $job)

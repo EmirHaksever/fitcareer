@@ -150,4 +150,30 @@ class JobController extends Controller
             'Job published.',
         );
     }
+
+    #[OA\Patch(
+        path: '/company/jobs/{job}/unpublish',
+        summary: 'Unpublish (close) a published company job',
+        security: [['sanctum' => []]],
+        tags: ['Company Jobs'],
+        parameters: [
+            new OA\Parameter(name: 'job', in: 'path', required: true, schema: new OA\Schema(type: 'integer')),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Job unpublished'),
+            new OA\Response(response: 422, description: 'Invalid state'),
+        ],
+    )]
+    public function unpublish(Job $job): JsonResponse
+    {
+        $job = $this->jobService->getForCompany(request()->user(), $job);
+        $this->authorize('unpublish', $job);
+
+        $job = $this->jobService->unpublish($job);
+
+        return $this->successResponse(
+            new CompanyJobResource($job),
+            'Job unpublished.',
+        );
+    }
 }

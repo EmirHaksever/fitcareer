@@ -1,11 +1,13 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BriefcaseBusiness, ClipboardList, ExternalLink, Plus } from 'lucide-react';
+import { BriefcaseBusiness, ClipboardList, ExternalLink, Plus, XCircle } from 'lucide-react';
 import { JOB_STATUS_LABELS } from '@/components/company-jobs/jobFormOptions';
 import { JobMetaTag } from '@/components/jobs/JobMetaTag';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody } from '@/components/ui/Card';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { EmptyState, Skeleton } from '@/components/ui/States';
-import { useCompanyJobs } from '@/hooks/useCompanyJobs';
+import { useCompanyJobs, useUnpublishCompanyJob } from '@/hooks/useCompanyJobs';
 import {
   formatEmploymentType,
   formatLocation,
@@ -16,9 +18,20 @@ import { companyPublicJobPath } from '@/utils/companyPortal';
 
 export function CompanyJobsPage() {
   const { data, isLoading, isError, refetch } = useCompanyJobs({ per_page: 50 });
+  const unpublishMutation = useUnpublishCompanyJob();
+  const [jobToUnpublish, setJobToUnpublish] = useState<{ id: number; title: string } | null>(
+    null,
+  );
 
   const jobs = data?.items ?? [];
   const total = data?.pagination.total ?? 0;
+
+  const handleConfirmUnpublish = () => {
+    if (!jobToUnpublish) return;
+    unpublishMutation.mutate(jobToUnpublish.id, {
+      onSuccess: () => setJobToUnpublish(null),
+    });
+  };
 
   return (
     <div className="space-y-6">
@@ -122,6 +135,17 @@ export function CompanyJobsPage() {
                       Başvurular
                     </Button>
                   </Link>
+                  {job.status === 'published' ? (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setJobToUnpublish({ id: job.id, title: job.title })}
+                    >
+                      <XCircle className="h-4 w-4" aria-hidden="true" />
+                      Yayından Kaldır
+                    </Button>
+                  ) : null}
                 </div>
               </CardBody>
             </Card>
@@ -129,6 +153,20 @@ export function CompanyJobsPage() {
           })}
         </div>
       ) : null}
+
+      <ConfirmDialog
+        open={jobToUnpublish !== null}
+        title="İlanı yayından kaldır"
+        description={
+          jobToUnpublish
+            ? `"${jobToUnpublish.title}" ilanını yayından kaldırmak istediğine emin misin? İlan kapatılacak ve adaylar tarafından görüntülenemeyecek.`
+            : ''
+        }
+        confirmLabel="Yayından Kaldır"
+        loading={unpublishMutation.isPending}
+        onConfirm={handleConfirmUnpublish}
+        onClose={() => setJobToUnpublish(null)}
+      />
     </div>
   );
 }

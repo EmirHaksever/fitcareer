@@ -22,6 +22,7 @@ import { CompanyJobCreatePage } from '@/pages/company/CompanyJobCreatePage';
 import { CompanyJobEditPage } from '@/pages/company/CompanyJobEditPage';
 import { CompanyJobsPage } from '@/pages/company/CompanyJobsPage';
 import { CompanySettingsPage } from '@/pages/company/CompanySettingsPage';
+import { AdminCompaniesPage } from '@/pages/admin/AdminCompaniesPage';
 import { SavedJobsPage } from '@/pages/candidate/SavedJobsPage';
 import { FitAnalysisPage } from '@/pages/candidate/FitAnalysisPage';
 import { NotificationsPage } from '@/pages/candidate/NotificationsPage';
@@ -82,6 +83,12 @@ export default function App() {
                 <Route path="/company/applications" element={<CompanyApplicationsPage />} />
                 <Route path="/company/applications/:id" element={<CompanyApplicationDetailPage />} />
                 <Route path="/company/settings" element={<CompanySettingsPage />} />
+              </Route>
+            </Route>
+
+            <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+              <Route element={<AppShell />}>
+                <Route path="/admin/companies" element={<AdminCompaniesPage />} />
               </Route>
             </Route>
 

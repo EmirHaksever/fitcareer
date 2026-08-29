@@ -6,6 +6,7 @@ import {
   FileUser,
   Home,
   LayoutDashboard,
+  ShieldCheck,
   Settings,
   Users,
 } from 'lucide-react';
@@ -35,13 +36,18 @@ const companyNav = [
   { to: '/company/settings', label: 'Ayarlar', icon: Settings },
 ];
 
+const adminNav = [
+  { to: '/admin/companies', label: 'Şirket Doğrulama', icon: ShieldCheck },
+];
+
 interface SidebarProps {
   onNavigate?: () => void;
 }
 
 export function Sidebar({ onNavigate }: SidebarProps) {
   const { user } = useAuth();
-  const navItems = user?.role === 'company' ? companyNav : candidateNav;
+  const navItems =
+    user?.role === 'company' ? companyNav : user?.role === 'admin' ? adminNav : candidateNav;
 
   return (
     <aside className="flex h-full w-72 flex-col border-r border-surface bg-white">
@@ -92,7 +98,7 @@ export function Sidebar({ onNavigate }: SidebarProps) {
               </NavLink>
             </CardBody>
           </Card>
-        ) : (
+        ) : user?.role === 'admin' ? null : (
           <CareerAssistantCard onNavigate={onNavigate} />
         )}
       </div>

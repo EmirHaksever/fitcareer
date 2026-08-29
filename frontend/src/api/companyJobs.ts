@@ -35,4 +35,11 @@ export const companyJobsApi = {
     const { data } = await apiClient.post<ApiResponse<CompanyJob>>(`/company/jobs/${id}/publish`);
     return data.data;
   },
+
+  async unpublish(id: number): Promise<CompanyJob> {
+    const { data } = await apiClient.patch<ApiResponse<CompanyJob>>(
+      `/company/jobs/${id}/unpublish`,
+    );
+    return data.data;
+  },
 };

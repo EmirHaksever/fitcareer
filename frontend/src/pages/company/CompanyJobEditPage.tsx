@@ -1,15 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import { ArrowLeft, CheckCircle2, ExternalLink, Rocket } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, ExternalLink, Rocket, XCircle } from 'lucide-react';
 import { CompanyJobForm, type CompanyJobFormValues } from '@/components/company-jobs/CompanyJobForm';
 import { JobFitScoreSettingsSection } from '@/components/company-jobs/JobFitScoreSettingsSection';
 import { JobSkillsSection } from '@/components/company-jobs/JobSkillsSection';
 import { JOB_STATUS_LABELS } from '@/components/company-jobs/jobFormOptions';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody } from '@/components/ui/Card';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { EmptyState, Skeleton } from '@/components/ui/States';
 import { getApiErrorMessage, getValidationErrors } from '@/api/client';
-import { useCompanyJob, usePublishCompanyJob, useUpdateCompanyJob } from '@/hooks/useCompanyJobs';
+import {
+  useCompanyJob,
+  usePublishCompanyJob,
+  useUnpublishCompanyJob,
+  useUpdateCompanyJob,
+} from '@/hooks/useCompanyJobs';
 import { sanitizePayload } from '@/utils/payload';
 import { validateCompanyJobPayload } from '@/utils/companyJobValidation';
 import { companyPublicJobPath } from '@/utils/companyPortal';
@@ -49,11 +55,13 @@ export function CompanyJobEditPage() {
   const { data: job, isLoading, isError, refetch } = useCompanyJob(jobId);
   const updateJob = useUpdateCompanyJob();
   const publishJob = usePublishCompanyJob();
+  const unpublishJob = useUnpublishCompanyJob();
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [bannerMessage, setBannerMessage] = useState<string | null>(
     (location.state as { message?: string } | null)?.message ?? null,
   );
   const [bannerError, setBannerError] = useState<string | null>(null);
+  const [confirmUnpublishOpen, setConfirmUnpublishOpen] = useState(false);
 
   useEffect(() => {
     if (bannerMessage) {
@@ -105,6 +113,20 @@ export function CompanyJobEditPage() {
       setBannerMessage('İlan başarıyla yayınlandı.');
     } catch (error) {
       setBannerError(getApiErrorMessage(error, 'İlan yayınlanamadı.'));
+    }
+  }
+
+  async function handleUnpublish() {
+    if (!job) return;
+
+    setBannerError(null);
+
+    try {
+      await unpublishJob.mutateAsync(job.id);
+      setBannerMessage('İlan yayından kaldırıldı.');
+      setConfirmUnpublishOpen(false);
+    } catch (error) {
+      setBannerError(getApiErrorMessage(error, 'İlan yayından kaldırılamadı.'));
     }
   }
 
@@ -178,6 +200,17 @@ export function CompanyJobEditPage() {
                 {publishJob.isPending ? 'Yayınlanıyor...' : 'Yayınla'}
               </Button>
             ) : null}
+            {isPublished ? (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setConfirmUnpublishOpen(true)}
+                disabled={unpublishJob.isPending}
+              >
+                <XCircle className="h-4 w-4" aria-hidden="true" />
+                Yayından Kaldır
+              </Button>
+            ) : null}
           </div>
         </div>
       </section>
@@ -232,6 +265,16 @@ export function CompanyJobEditPage() {
           />
         </div>
       )}
+
+      <ConfirmDialog
+        open={confirmUnpublishOpen}
+        title="İlanı yayından kaldır"
+        description="Bu ilanı yayından kaldırmak istediğine emin misin? İlan kapatılacak ve adaylar tarafından görüntülenemeyecek."
+        confirmLabel="Yayından Kaldır"
+        loading={unpublishJob.isPending}
+        onConfirm={() => void handleUnpublish()}
+        onClose={() => setConfirmUnpublishOpen(false)}
+      />
     </div>
   );
 }

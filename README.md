@@ -49,9 +49,27 @@ Vite proxies `/api` to the Laravel backend (see `frontend/vite.config.ts`).
 
 ### 3. Job ingestion (optional)
 
+Job listings are ingested from ~30 active sources across the following ATS
+integrations, plus a dedicated Kariyer.net parser:
+
+- Lever
+- Greenhouse
+- Workable
+- Ashby
+- Recruitee
+- Kariyer.net (scraper)
+
+Seed the source records for each provider, then trigger an import:
+
 ```bash
-php scripts/seed-remotive-source.php
-php artisan jobs:import-source remotive --sync
+php scripts/seed-lever-sources.php
+php scripts/seed-greenhouse-sources.php
+php scripts/seed-workable-sources.php
+php scripts/seed-ashby-sources.php
+php scripts/seed-recruitee-sources.php
+php scripts/seed-kariyer-net-source.php
+
+php artisan jobs:import-source <source-name> --sync
 php artisan jobs:source-health
 ```
 

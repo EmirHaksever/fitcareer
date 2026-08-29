@@ -8,6 +8,7 @@ use App\Enums\CompanyVerificationStatus;
 use App\Models\Company;
 use App\Models\User;
 use App\Support\ResolvesCompany;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -117,6 +118,14 @@ class CompanyService
         $company->save();
 
         return $company->fresh();
+    }
+
+    public function listPending(int $page = 1, int $perPage = 15): LengthAwarePaginator
+    {
+        return Company::query()
+            ->where('verification_status', CompanyVerificationStatus::Pending)
+            ->orderBy('created_at')
+            ->paginate($perPage, ['*'], 'page', $page);
     }
 
     public function findForVerification(string $identifier): Company

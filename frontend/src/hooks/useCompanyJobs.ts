@@ -61,3 +61,15 @@ export function usePublishCompanyJob() {
     },
   });
 }
+
+export function useUnpublishCompanyJob() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => companyJobsApi.unpublish(id),
+    onSuccess: (_data, id) => {
+      void queryClient.invalidateQueries({ queryKey: COMPANY_JOBS_KEY });
+      void queryClient.invalidateQueries({ queryKey: [...COMPANY_JOBS_KEY, 'detail', id] });
+    },
+  });
+}

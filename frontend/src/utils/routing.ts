@@ -5,5 +5,9 @@ export function getDefaultRouteForRole(role: UserRole): string {
     return '/company/dashboard';
   }
 
+  if (role === 'admin') {
+    return '/admin/companies';
+  }
+
   return '/dashboard';
 }

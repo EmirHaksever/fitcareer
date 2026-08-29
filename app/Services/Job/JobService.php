@@ -118,6 +118,26 @@ class JobService
         return $publishedJob->fresh(['company', 'sourceProvider', 'skills']);
     }
 
+    public function unpublish(Job $job): Job
+    {
+        if ($job->source !== JobOrigin::Internal) {
+            throw ValidationException::withMessages([
+                'job' => ['Only internal jobs can be modified.'],
+            ]);
+        }
+
+        if ($job->status !== JobStatus::Published) {
+            throw ValidationException::withMessages([
+                'status' => ['Only published jobs can be unpublished.'],
+            ]);
+        }
+
+        $job->status = JobStatus::Closed;
+        $job->save();
+
+        return $job->fresh(['company', 'sourceProvider', 'skills']);
+    }
+
     public function getPublishedBySlug(string $slug, ?int $candidateProfileId = null): Job
     {
         $job = Job::query()

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\Admin\CompanyVerificationController as AdminCompanyVerificationController;
 use App\Http\Controllers\Api\V1\Auth\CurrentUserController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
@@ -140,6 +141,7 @@ Route::prefix('v1')->group(function (): void {
             Route::get('jobs/{job}', [CompanyJobController::class, 'show']);
             Route::put('jobs/{job}', [CompanyJobController::class, 'update']);
             Route::post('jobs/{job}/publish', [CompanyJobController::class, 'publish']);
+            Route::patch('jobs/{job}/unpublish', [CompanyJobController::class, 'unpublish']);
 
             Route::get('jobs/{job}/skills', [CompanyJobSkillController::class, 'index']);
             Route::post('jobs/{job}/skills', [CompanyJobSkillController::class, 'store']);
@@ -152,5 +154,12 @@ Route::prefix('v1')->group(function (): void {
             Route::get('applications', [CompanyApplicationController::class, 'index']);
             Route::get('applications/{application}', [CompanyApplicationController::class, 'show']);
             Route::patch('applications/{application}/status', [CompanyApplicationController::class, 'updateStatus']);
+        });
+
+    Route::prefix('admin')
+        ->middleware(['auth:sanctum', 'role:admin'])
+        ->group(function (): void {
+            Route::get('companies/pending', [AdminCompanyVerificationController::class, 'pending']);
+            Route::post('companies/{company}/verify', [AdminCompanyVerificationController::class, 'verify']);
         });
 });

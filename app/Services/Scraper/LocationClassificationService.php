@@ -242,7 +242,7 @@ class LocationClassificationService
                 category: TurkeyLocationCategory::RemoteTurkey,
                 isTurkeyRelevant: true,
                 city: $this->resolvePrimaryCity($input, $rawStrings),
-                country: $this->preserveCountryOrDefault($input, $input->country, 'Turkey'),
+                country: $this->preserveCountryOrDefault($input, $input->country, 'Türkiye'),
             );
         }
 
@@ -555,7 +555,7 @@ class LocationClassificationService
         }
 
         if ($input->country !== null && $this->isTurkeyCountryToken($input->country)) {
-            return $input->country;
+            return $this->canonicalTurkeyCountryLabel($input);
         }
 
         $countryAsCityKey = $this->detectTurkeyCityKey($input->country, '');
@@ -583,7 +583,7 @@ class LocationClassificationService
     private function preserveCountryOrDefault(LocationInput $input, ?string $country, string $default): ?string
     {
         if ($country !== null && $this->isTurkeyCountryToken($country)) {
-            return $country;
+            return $this->canonicalTurkeyCountryLabel($input);
         }
 
         if ($country !== null && $this->detectTurkeyCityKey($country, '') !== null) {
@@ -607,21 +607,14 @@ class LocationClassificationService
             && $cityKey !== $countryKey;
     }
 
+    /**
+     * Single canonical label used for every Turkey-classified job, regardless of
+     * how the source provider spelled it ("Turkey", "TR", "turkiye", ...). Keeping
+     * one standard value avoids the "Turkey" vs "Türkiye" data inconsistency.
+     */
     private function canonicalTurkeyCountryLabel(LocationInput $input): string
     {
-        foreach ($input->rawLocationStrings as $string) {
-            $normalized = mb_strtolower($this->normalizeText($string));
-
-            if (str_contains($normalized, 'türkiye') || str_contains($normalized, 'turkiye')) {
-                return 'Türkiye';
-            }
-        }
-
-        if ($input->country !== null && $this->isTurkeyCountryToken($input->country)) {
-            return $input->country;
-        }
-
-        return 'Turkey';
+        return 'Türkiye';
     }
 
     private function buildResult(
