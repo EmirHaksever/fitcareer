@@ -90,7 +90,7 @@ class CompanyJobFitScoreSettingsTest extends TestCase
         $this->assertDatabaseHas('jobs', [
             'id' => $job->id,
         ]);
-        $this->assertSame($this->customWeights(), $job->fresh()->fit_score_weights);
+        $this->assertEqualsCanonicalizing($this->customWeights(), $job->fresh()->fit_score_weights);
     }
 
     #[Test]
