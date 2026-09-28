@@ -75,6 +75,12 @@ export interface PaginatedJobs {
   };
 }
 
+export interface PublicStats {
+  published_jobs: number;
+  trust_analyzed_jobs: number;
+  active_sources: number;
+}
+
 export interface JobSearchParams {
   keyword?: string;
   location?: string;

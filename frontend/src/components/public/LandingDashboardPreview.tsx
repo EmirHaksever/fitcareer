@@ -1,6 +1,7 @@
 import { ArrowUpRight, Database, ShieldCheck, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useJobs } from '@/hooks/useJobs';
+import { usePublicStats } from '@/hooks/usePublicStats';
 import { JobSourceBadge } from '@/components/jobs/JobSourceBadge';
 import { JobCompanyAvatar } from '@/components/jobs/JobCompanyAvatar';
 import { TrustScore } from '@/components/ui/TrustScore';
@@ -35,11 +36,9 @@ export function LandingDashboardPreview() {
     sort: 'trust_score',
   });
 
+  const { data: stats } = usePublicStats();
+
   const jobs = data?.items ?? [];
-  const analyzedCount = jobs.filter((job) => job.trust_score !== null).length;
-  const sourceCount = new Set(
-    jobs.map((job) => job.source_provider?.name ?? (job.source === 'scraped' ? 'Dış kaynak' : 'İşveren')),
-  ).size;
 
   return (
     <div className="bg-[#F8FAFC] p-4 sm:p-6">
@@ -62,15 +61,15 @@ export function LandingDashboardPreview() {
       <div className="mb-5 grid gap-3 sm:grid-cols-3">
         <div className="rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3">
           <p className="text-xs text-[#64748B]">Yayındaki ilan</p>
-          <p className="mt-1 text-xl font-bold text-[#0F172A]">{data?.pagination.total ?? '—'}</p>
+          <p className="mt-1 text-xl font-bold text-[#0F172A]">{stats?.published_jobs ?? '—'}</p>
         </div>
         <div className="rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3">
           <p className="text-xs text-[#64748B]">Güven analizi</p>
-          <p className="mt-1 text-xl font-bold text-[#0F172A]">{isLoading ? '—' : `${analyzedCount}/${jobs.length}`}</p>
+          <p className="mt-1 text-xl font-bold text-[#0F172A]">{stats ? `${stats.trust_analyzed_jobs}/${stats.published_jobs}` : '—'}</p>
         </div>
         <div className="rounded-2xl border border-[#E2E8F0] bg-white px-4 py-3">
           <p className="text-xs text-[#64748B]">Aktif kaynak</p>
-          <p className="mt-1 text-xl font-bold text-[#0F172A]">{isLoading ? '—' : sourceCount}</p>
+          <p className="mt-1 text-xl font-bold text-[#0F172A]">{stats?.active_sources ?? '—'}</p>
         </div>
       </div>
 

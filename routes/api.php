@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\V1\Company\PublicCompanyController;
 use App\Http\Controllers\Api\V1\Company\VerificationController as CompanyVerificationController;
 use App\Http\Controllers\Api\V1\Job\JobController;
 use App\Http\Controllers\Api\V1\Job\JobSearchController;
+use App\Http\Controllers\Api\V1\Job\PublicStatsController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -42,6 +43,7 @@ Route::prefix('v1')->group(function (): void {
 
     Route::get('/skills', [SkillLookupController::class, 'index']);
     Route::get('/companies/{slug}', [PublicCompanyController::class, 'show']);
+    Route::get('/stats', [PublicStatsController::class, 'show'])->middleware('throttle:job-search');
 
     Route::middleware(['optional.sanctum', 'throttle:job-search'])->group(function (): void {
         Route::get('/jobs', [JobSearchController::class, 'index']);
