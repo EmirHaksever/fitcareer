@@ -18,6 +18,7 @@ import {
   formatEmploymentType,
   formatExperienceLevel,
   formatLocation,
+  formatLastSeen,
   formatRelativeTime,
   formatSalary,
   formatTrustLabel,
@@ -345,6 +346,7 @@ export function JobDetailHero({
 }) {
   const salary = formatSalary(job.salary_min, job.salary_max, job.salary_currency, job.is_salary_visible);
   const publishedLabel = formatRelativeTime(job.published_at);
+  const lastSeenLabel = formatLastSeen(job.last_seen_at ?? null);
   const companyName = getJobCompanyName(job);
 
   return (
@@ -371,7 +373,11 @@ export function JobDetailHero({
               {salary ? <JobMetaTag>{salary}</JobMetaTag> : null}
             </div>
 
-            {publishedLabel ? <p className="text-sm text-ink-muted">{publishedLabel}</p> : null}
+            {publishedLabel || lastSeenLabel ? (
+              <p className="text-sm text-ink-muted">
+                {[publishedLabel, lastSeenLabel].filter(Boolean).join(' · ')}
+              </p>
+            ) : null}
           </div>
 
           <div className="flex w-full gap-3 lg:w-auto lg:min-w-[320px]">

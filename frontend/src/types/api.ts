@@ -45,6 +45,7 @@ export interface JobListItem {
   salary_currency: string | null;
   is_salary_visible: boolean;
   published_at: string | null;
+  last_seen_at?: string | null;
   source?: string;
   source_company_name?: string | null;
   source_provider?: {

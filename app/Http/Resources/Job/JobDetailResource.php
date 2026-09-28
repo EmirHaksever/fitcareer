@@ -50,6 +50,7 @@ class JobDetailResource extends JsonResource
             'source_company_name' => $this->source_company_name,
             'external_url' => $this->external_url,
             'published_at' => $this->published_at?->toIso8601String(),
+            'last_seen_at' => $this->last_seen_at?->toIso8601String(),
             'expires_at' => $this->expires_at?->toIso8601String(),
             'company' => $this->whenLoaded('company', fn () => $this->company === null ? null : [
                 'id' => $this->company->id,

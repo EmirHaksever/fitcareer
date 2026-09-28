@@ -42,6 +42,7 @@ class JobListResource extends JsonResource
             'salary_currency' => $this->when($this->is_salary_visible, $this->salary_currency),
             'is_salary_visible' => $this->is_salary_visible,
             'published_at' => $this->published_at?->toIso8601String(),
+            'last_seen_at' => $this->last_seen_at?->toIso8601String(),
             'source' => $this->source->value,
             'source_company_name' => $this->source_company_name,
             'company' => $this->whenLoaded('company', fn () => [

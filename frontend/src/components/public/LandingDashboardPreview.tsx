@@ -33,7 +33,7 @@ function PreviewJob({ job }: { job: JobListItem }) {
 export function LandingDashboardPreview() {
   const { data, isLoading, isError } = useJobs({
     per_page: 4,
-    sort: 'trust_score',
+    sort: 'published_at',
   });
 
   const { data: stats } = usePublicStats();
@@ -50,7 +50,7 @@ export function LandingDashboardPreview() {
             </span>
             <p className="text-sm font-semibold text-[#0F172A]">Canlı ilan önizlemesi</p>
           </div>
-          <p className="mt-1 text-xs text-[#64748B]">Güncel kaynaklardan gelen ilanlar Trust Score ile sıralanıyor.</p>
+          <p className="mt-1 text-xs text-[#64748B]">En yeni ilanlar; her biri Trust Score ile değerlendirildi.</p>
         </div>
         <Link to="/register" className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline">
           Kendi panelini aç

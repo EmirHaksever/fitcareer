@@ -140,3 +140,19 @@ export function formatRelativeTime(isoDate: string | null): string | null {
 
   return `${date.toLocaleDateString('tr-TR')} tarihinde yayınlandı`;
 }
+
+/** Scraped jobs are re-seen on every import; unseen ones go stale and expire. */
+export function formatLastSeen(isoDate: string | null): string | null {
+  if (!isoDate) return null;
+
+  const date = new Date(isoDate);
+  if (Number.isNaN(date.getTime())) return null;
+
+  const diffMs = Date.now() - date.getTime();
+  const diffHours = Math.floor(diffMs / 3_600_000);
+  const diffDays = Math.floor(diffMs / 86_400_000);
+
+  const when = diffHours < 1 ? 'az önce' : diffHours < 24 ? `${diffHours} saat önce` : `${diffDays} gün önce`;
+
+  return `Son kontrol: ${when} · kaynağında hâlâ açık`;
+}

@@ -179,8 +179,8 @@ class MySqlFulltextJobSearchRepository implements JobSearchRepositoryInterface
                 ->orderByDesc('trust_score')
                 ->orderByDesc('published_at'),
             'fit_score' => $this->applyFitScoreSorting($builder, $query),
+            // Every import refreshes last_scraped_at, so it says nothing about age.
             default => $builder
-                ->orderByDesc('last_scraped_at')
                 ->orderByDesc('published_at')
                 ->orderByDesc('id'),
         };
