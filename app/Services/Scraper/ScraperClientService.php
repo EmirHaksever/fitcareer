@@ -451,13 +451,25 @@ class ScraperClientService
         $accountName = is_string($payload['name'] ?? null) ? trim($payload['name']) : '';
 
         $listingsByShortcode = [];
+        $turkeyFirst = ($source->config['ingest_policy'] ?? null) === 'turkey_first';
 
         foreach ($payload['jobs'] as $job) {
             if (! is_array($job) || ! isset($job['shortcode'], $job['title'])) {
                 continue;
             }
 
-            $listingsByShortcode[(string) $job['shortcode']] = [
+            $shortcode = (string) $job['shortcode'];
+
+            // A multi-country posting comes back as one row per country with the same
+            // shortcode; don't let a foreign row replace the Turkey one.
+            if ($turkeyFirst
+                && isset($listingsByShortcode[$shortcode])
+                && $this->isWorkableTurkeyListing($listingsByShortcode[$shortcode])
+                && ! $this->isWorkableTurkeyListing($job)) {
+                continue;
+            }
+
+            $listingsByShortcode[$shortcode] = [
                 ...$job,
                 '_workable_account_name' => $accountName !== '' ? $accountName : null,
             ];
@@ -476,7 +488,35 @@ class ScraperClientService
             'latency_ms' => $latencyMs,
         ]);
 
+        if (($source->config['ingest_policy'] ?? null) === 'turkey_first') {
+            // Big global boards list thousands of postings; cap after moving Turkey ones up front.
+            $listings = [
+                ...array_filter($listings, $this->isWorkableTurkeyListing(...)),
+                ...array_filter($listings, fn (array $listing): bool => ! $this->isWorkableTurkeyListing($listing)),
+            ];
+        }
+
         return array_slice($listings, 0, $limits->maxListings);
+    }
+
+    /**
+     * @param  array<string, mixed>  $listing
+     */
+    private function isWorkableTurkeyListing(array $listing): bool
+    {
+        $countries = [$listing['country'] ?? null];
+
+        foreach (is_array($listing['locations'] ?? null) ? $listing['locations'] : [] as $location) {
+            $countries[] = is_array($location) ? ($location['countryCode'] ?? $location['country'] ?? null) : null;
+        }
+
+        foreach ($countries as $country) {
+            if (is_string($country) && in_array(mb_strtolower(trim($country)), ['turkey', 'türkiye', 'turkiye', 'tr'], true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

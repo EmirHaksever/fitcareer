@@ -259,6 +259,13 @@ class LocationClassificationService
             || $this->containsTurkeyCountryToken($searchBlob);
         $turkeyCityKey = $this->detectTurkeyCityKey($input->city, $searchBlob);
 
+        // With an explicit foreign country, a substring hit ("Villa d'Agri" -> Ağrı) is not
+        // enough; only an exact Turkish city name can override the country.
+        if ($turkeyCityKey !== null && ! $turkeyCountry && $this->isForeignCountryToken($input->country)
+            && ! $this->isExactTurkeyCity($input->city)) {
+            $turkeyCityKey = null;
+        }
+
         if ($this->isForeignCountryToken($input->country) && ! $turkeyCountry && $turkeyCityKey === null) {
             return $this->buildResult(
                 category: TurkeyLocationCategory::Foreign,
@@ -674,6 +681,23 @@ class LocationClassificationService
         }
 
         return array_values(array_unique($parts));
+    }
+
+    private function isExactTurkeyCity(?string $city): bool
+    {
+        if ($city === null || trim($city) === '') {
+            return false;
+        }
+
+        $normalized = $this->normalizeText($city);
+
+        foreach (self::TURKEY_CITIES as $key => $aliases) {
+            if ($normalized === $key || in_array($normalized, array_map($this->normalizeText(...), $aliases), true)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function segmentMatchesCity(string $segment, string $cityToken): bool

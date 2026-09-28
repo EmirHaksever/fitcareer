@@ -24,6 +24,32 @@ class LocationClassificationServiceTest extends TestCase
     }
 
     #[Test]
+    public function foreign_town_containing_a_turkish_city_name_stays_foreign(): void
+    {
+        // "Villa d'Agri" (Italy) contains "agri" (Ağrı) but the country is explicit.
+        $result = $this->classifier->classify(LocationInput::fromSignals(
+            city: "Villa d'Agri",
+            country: 'Italy',
+            workType: WorkType::Onsite,
+        ));
+
+        $this->assertFalse($result->isTurkeyRelevant);
+        $this->assertSame('Italy', $result->country);
+    }
+
+    #[Test]
+    public function exact_turkish_city_still_wins_over_a_foreign_country_label(): void
+    {
+        $result = $this->classifier->classify(LocationInput::fromSignals(
+            city: 'Istanbul',
+            country: 'Germany',
+            workType: WorkType::Onsite,
+        ));
+
+        $this->assertTrue($result->isTurkeyRelevant);
+    }
+
+    #[Test]
     public function classifies_istanbul_turkey_as_turkey_relevant(): void
     {
         $result = $this->classifier->classify(LocationInput::fromSignals(
