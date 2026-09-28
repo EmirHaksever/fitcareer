@@ -10,7 +10,7 @@ describe('getDefaultRouteForRole', () => {
     expect(getDefaultRouteForRole('candidate')).toBe('/dashboard');
   });
 
-  it('routes admin users to candidate dashboard fallback', () => {
-    expect(getDefaultRouteForRole('admin')).toBe('/dashboard');
+  it('routes admin users to the company verification workspace', () => {
+    expect(getDefaultRouteForRole('admin')).toBe('/admin/companies');
   });
 });

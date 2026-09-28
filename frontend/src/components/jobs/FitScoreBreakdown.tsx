@@ -1,4 +1,4 @@
-import { CheckCircle2, MinusCircle, XCircle } from 'lucide-react';
+import { CheckCircle2, Info, MinusCircle, XCircle } from 'lucide-react';
 import type { FitScoreDetails } from '@/types/fitScore';
 import { buildFitBreakdown } from '@/utils/fitScoreBreakdown';
 import { cn } from '@/utils/format';
@@ -39,8 +39,31 @@ export function FitScoreBreakdown({ details, className }: FitScoreBreakdownProps
     return null;
   }
 
+  const confidence = details?.confidence ?? null;
+  const confidencePercent = confidence === null
+    ? null
+    : Math.round((confidence <= 1 ? confidence : confidence / 100) * 100);
+
   return (
     <div className={cn('space-y-4', className)}>
+      <section className="rounded-xl border border-primary/15 bg-primary/5 px-4 py-4">
+        <div className="flex items-start gap-3">
+          <span className="mt-0.5 inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white text-primary shadow-sm">
+            <Info className="h-4 w-4" aria-hidden="true" />
+          </span>
+          <div className="min-w-0">
+            <h3 className="text-sm font-semibold text-ink">Bu skor nasıl oluştu?</h3>
+            <p className="mt-1 text-sm leading-6 text-ink-muted">
+              Fit Score; gerekli ve tercih edilen yetenekler, deneyim, çalışma şekli, lokasyon ve maaş sinyallerinin profilinle karşılaştırılmasıyla hesaplanır. Her sinyal aşağıda kanıtıyla birlikte gösterilir.
+            </p>
+            {confidencePercent !== null ? (
+              <p className="mt-2 text-xs font-medium text-primary">
+                Analiz güveni: %{confidencePercent}
+              </p>
+            ) : null}
+          </div>
+        </div>
+      </section>
       <h3 className="text-sm font-semibold uppercase tracking-wide text-ink-muted">
         Uyum Detayları
       </h3>

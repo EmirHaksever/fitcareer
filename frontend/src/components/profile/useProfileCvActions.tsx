@@ -52,9 +52,9 @@ export function useProfileCvActions({
         className="hidden"
         onChange={(e) => void handleUpload(e.target.files?.[0] ?? null)}
       />
-      <Button type="button" variant="outline" size="sm" onClick={() => fileRef.current?.click()} loading={uploadLoading}>
+      <Button type="button" variant={hasCv ? 'outline' : 'primary'} size="sm" onClick={() => fileRef.current?.click()} loading={uploadLoading}>
         <Upload className="h-4 w-4" aria-hidden="true" />
-        CV Yükle / Güncelle
+        {hasCv ? 'CV Yükle / Güncelle' : 'CV Yükleyerek Başla'}
       </Button>
     </>
   );

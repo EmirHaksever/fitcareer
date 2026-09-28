@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\Admin\CompanyVerificationController as AdminCompanyVerificationController;
+use App\Http\Controllers\Api\V1\Admin\JobSourceHealthController as AdminJobSourceHealthController;
 use App\Http\Controllers\Api\V1\Auth\CurrentUserController;
 use App\Http\Controllers\Api\V1\Auth\EmailVerificationController;
 use App\Http\Controllers\Api\V1\Auth\LoginController;
@@ -161,5 +162,6 @@ Route::prefix('v1')->group(function (): void {
         ->group(function (): void {
             Route::get('companies/pending', [AdminCompanyVerificationController::class, 'pending']);
             Route::post('companies/{company}/verify', [AdminCompanyVerificationController::class, 'verify']);
+            Route::get('job-sources/health', [AdminJobSourceHealthController::class, 'index']);
         });
 });

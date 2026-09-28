@@ -4,6 +4,18 @@ Aday ve işveren için iş platformu. Laravel API + React / TypeScript arayüz: 
 
 Personal portfolio project — not a company codebase.
 
+**Canlı demo:** [fitcareer.emirhaksever.com](https://fitcareer.emirhaksever.com) · **Case study:** [emirhaksever.com/proje/fitcareer-guvenilir-is-eslestirme-platformu.html](https://emirhaksever.com/proje/fitcareer-guvenilir-is-eslestirme-platformu.html)
+
+![FitCareer ana sayfa](docs/screenshots/fitcareer-hero.jpg)
+
+| Açıklanabilir Fit Score | Şirket paneli ve aday pipeline'ı |
+|---|---|
+| ![Fit Score](docs/screenshots/fitcareer-fit-score.jpg) | ![Şirket paneli](docs/screenshots/fitcareer-company.jpg) |
+
+![İlan arama](docs/screenshots/fitcareer-search.jpg)
+
+> Ekran görüntüleri demo verisiyle alınmıştır.
+
 ## Stack
 
 | Layer | Technology |

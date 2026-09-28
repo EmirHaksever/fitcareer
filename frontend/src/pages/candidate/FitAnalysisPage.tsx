@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { CandidateCvActivationCard } from '@/components/candidate/CandidateCvActivationCard';
 import { JobCard } from '@/components/jobs/JobCard';
 import { Button } from '@/components/ui/Button';
 import { Card, CardBody } from '@/components/ui/Card';
@@ -7,9 +8,11 @@ import { useCanViewFitScore } from '@/hooks/useCanViewFitScore';
 import { useDashboardStats } from '@/hooks/useDashboardStats';
 import { useCandidateProfile } from '@/hooks/useCandidateProfile';
 import { useSavedJobIds } from '@/hooks/useSavedJobs';
+import { useAuth } from '@/hooks/useAuth';
 
 export function FitAnalysisPage() {
   const showFitScore = useCanViewFitScore();
+  const { user } = useAuth();
   const { data: profile } = useCandidateProfile();
   const { data, isLoading, isError, refetch } = useDashboardStats();
   const { data: savedJobIds = [] } = useSavedJobIds();
@@ -17,7 +20,7 @@ export function FitAnalysisPage() {
   const analyzedJobs = data?.analyzed_jobs ?? [];
   const stats = data?.stats;
 
-  if (!showFitScore) {
+  if (user?.role !== 'candidate') {
     return (
       <EmptyState
         title="Uyum analizi için giriş gerekli"
@@ -28,6 +31,31 @@ export function FitAnalysisPage() {
           </Link>
         }
       />
+    );
+  }
+
+  if (!isLoading && profile && !profile.has_cv) {
+    return (
+      <div className="space-y-6">
+        <header className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight text-ink sm:text-3xl">Uyum Analizi</h1>
+          <p className="text-sm text-ink-muted">
+            Sana uygun fırsatları bulmak için önce CV profilini oluşturalım.
+          </p>
+        </header>
+        <CandidateCvActivationCard
+          compact
+          profileStrength={profile.profile_strength_score}
+        />
+        <Card>
+          <CardBody className="space-y-2">
+            <h2 className="text-base font-semibold text-ink">Sonraki adım</h2>
+            <p className="text-sm leading-6 text-ink-muted">
+              CV yükledikten sonra içeriğini gözden geçirip profil alanlarını tek tıkla doldurabilirsin. Ardından ilanları açtıkça Fit Score hesaplanır.
+            </p>
+          </CardBody>
+        </Card>
+      </div>
     );
   }
 

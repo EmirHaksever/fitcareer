@@ -8,6 +8,7 @@ import {
 import { Link } from 'react-router-dom';
 import { Logo } from '@/components/brand/Logo';
 import { Button } from '@/components/ui/Button';
+import { LandingDashboardPreview } from '@/components/public/LandingDashboardPreview';
 
 const miniFeatures = [
   {
@@ -156,15 +157,10 @@ export function LandingPage() {
               <span className="h-2.5 w-2.5 rounded-full bg-[#E2E8F0]" />
               <span className="h-2.5 w-2.5 rounded-full bg-[#E2E8F0]" />
             </div>
-            <img
-              src="/assets/product-dashboard.png"
-              alt="FitCareer aday paneli — Trust Score ve Fit Score ile ilan önerileri"
-              className="w-full"
-              loading="lazy"
-            />
+            <LandingDashboardPreview />
           </div>
           <p className="mt-4 text-center text-sm text-[#64748B]">
-            Gerçek aday paneli: güvenilirlik skoruna göre sıralanan ilanlar ve profil uyumu.
+            Canlı ilan kaynaklarından beslenen ürün önizlemesi: güvenilirlik ve kişisel uyum aynı akışta.
           </p>
         </section>
       </main>

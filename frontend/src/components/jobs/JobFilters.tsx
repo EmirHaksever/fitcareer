@@ -17,6 +17,7 @@ interface JobFiltersProps {
   onReset: () => void;
   className?: string;
   showHeader?: boolean;
+  showFitScore?: boolean;
 }
 
 const selectClassName =
@@ -37,7 +38,7 @@ function FilterField({
   );
 }
 
-function FiltersForm({ values, onChange, onReset }: Omit<JobFiltersProps, 'className' | 'showHeader'>) {
+function FiltersForm({ values, onChange, onReset, showFitScore = true }: Omit<JobFiltersProps, 'className' | 'showHeader'>) {
   return (
     <div className="space-y-4">
       <Input
@@ -117,21 +118,23 @@ function FiltersForm({ values, onChange, onReset }: Omit<JobFiltersProps, 'class
         }
       />
 
-      <Input
-        label="En düşük uyum skoru"
-        name="min_fit_score"
-        type="number"
-        min={0}
-        max={100}
-        placeholder="0-100"
-        value={values.min_fit_score ?? ''}
-        onChange={(event) =>
-          onChange({
-            min_fit_score: event.target.value ? Number(event.target.value) : undefined,
-            page: 1,
-          })
-        }
-      />
+      {showFitScore ? (
+        <Input
+          label="En düşük uyum skoru"
+          name="min_fit_score"
+          type="number"
+          min={0}
+          max={100}
+          placeholder="0-100"
+          value={values.min_fit_score ?? ''}
+          onChange={(event) =>
+            onChange({
+              min_fit_score: event.target.value ? Number(event.target.value) : undefined,
+              page: 1,
+            })
+          }
+        />
+      ) : null}
 
       <Button type="button" variant="outline" className="w-full" onClick={onReset}>
         Filtreleri Temizle
@@ -146,6 +149,7 @@ export function JobFilters({
   onReset,
   className,
   showHeader = true,
+  showFitScore = true,
 }: JobFiltersProps) {
   return (
     <Card className={cn('overflow-hidden', className)}>
@@ -158,7 +162,7 @@ export function JobFilters({
         </CardHeader>
       ) : null}
       <CardBody>
-        <FiltersForm values={values} onChange={onChange} onReset={onReset} />
+        <FiltersForm values={values} onChange={onChange} onReset={onReset} showFitScore={showFitScore} />
       </CardBody>
     </Card>
   );
@@ -177,6 +181,7 @@ export function JobFiltersDrawer({
   values,
   onChange,
   onReset,
+  showFitScore = true,
 }: JobFiltersDrawerProps) {
   if (!open) return null;
 
@@ -209,7 +214,7 @@ export function JobFiltersDrawer({
           </button>
         </div>
         <div className="flex-1 overflow-y-auto p-5">
-          <FiltersForm values={values} onChange={onChange} onReset={onReset} />
+          <FiltersForm values={values} onChange={onChange} onReset={onReset} showFitScore={showFitScore} />
         </div>
         <div className="border-t border-surface p-4">
           <Button className="w-full" onClick={onClose}>

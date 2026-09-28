@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
+import { CandidateCvActivationCard } from '@/components/candidate/CandidateCvActivationCard';
 import { EmptyState, Skeleton } from '@/components/ui/States';
 import { useProfileCvActions } from '@/components/profile/useProfileCvActions';
 import { ProfileCvImportBanner } from '@/components/profile/ProfileCvImportBanner';
@@ -118,6 +119,10 @@ export function ProfilePage() {
         >
           {feedback.message}
         </div>
+      ) : null}
+
+      {!profile.has_cv ? (
+        <CandidateCvActivationCard compact action={cvActions.uploadButton} />
       ) : null}
 
       <ProfileCvImportBanner

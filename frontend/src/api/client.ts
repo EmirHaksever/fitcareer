@@ -6,6 +6,7 @@ import {
 } from '@/utils/authValidationMessages';
 
 const TOKEN_KEY = 'fitcareer_token';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 export const getStoredToken = (): string | null => localStorage.getItem(TOKEN_KEY);
 
@@ -18,7 +19,7 @@ export const clearStoredToken = (): void => {
 };
 
 export const apiClient = axios.create({
-  baseURL: '/api/v1',
+  baseURL: API_BASE_URL,
   headers: {
     Accept: 'application/json',
     'Content-Type': 'application/json',

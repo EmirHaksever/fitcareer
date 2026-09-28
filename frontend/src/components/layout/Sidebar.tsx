@@ -1,4 +1,5 @@
 import {
+  Activity,
   Bell,
   Bookmark,
   BriefcaseBusiness,
@@ -38,6 +39,7 @@ const companyNav = [
 
 const adminNav = [
   { to: '/admin/companies', label: 'Şirket Doğrulama', icon: ShieldCheck },
+  { to: '/admin/sources', label: 'İlan Kaynakları', icon: Activity },
 ];
 
 interface SidebarProps {

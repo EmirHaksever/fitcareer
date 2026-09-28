@@ -329,10 +329,13 @@ export function CompanyDashboardPage() {
       </section>
 
       <section className="grid min-w-0 gap-6 xl:grid-cols-[2fr_1fr]">
-        <Card>
+        <Card data-testid="candidate-pipeline">
           <CardHeader>
-            <h2 className="text-lg font-semibold text-ink">Başvuru Hunisi</h2>
-            <p className="text-sm text-ink-muted">Aktif süreçteki aday dağılımı</p>
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-primary" aria-hidden="true" />
+              <h2 className="text-lg font-semibold text-ink">Aday Pipeline’ı</h2>
+            </div>
+            <p className="text-sm text-ink-muted">Adayların başvurudan teklife kadar hangi aşamada olduğunu takip et.</p>
           </CardHeader>
           <CardBody className="space-y-4">
             <PipelineBarChart segments={pipelineSegments} />

@@ -86,6 +86,7 @@ export interface JobSearchParams {
   max_salary?: number;
   min_trust_score?: number;
   min_fit_score?: number;
+  include_global?: boolean;
   sort?: 'published_at' | 'salary' | 'trust_score' | 'fit_score';
   page?: number;
   per_page?: number;

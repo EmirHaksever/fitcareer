@@ -12,6 +12,60 @@
         }
     ],
     "paths": {
+        "/admin/companies/pending": {
+            "get": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "List companies with a pending verification request",
+                "operationId": "7be2f59150567a1f7da1b962326f2781",
+                "responses": {
+                    "200": {
+                        "description": "Pending companies returned"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/admin/companies/{company}/verify": {
+            "post": {
+                "tags": [
+                    "Admin"
+                ],
+                "summary": "Approve or reject a pending company verification request",
+                "operationId": "5f91348e98c4102c57d4b32d361788d2",
+                "parameters": [
+                    {
+                        "name": "company",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Verification decision applied"
+                    },
+                    "422": {
+                        "description": "Invalid state"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/auth/me": {
             "get": {
                 "tags": [
@@ -373,6 +427,85 @@
                 }
             }
         },
+        "/candidate/applications": {
+            "get": {
+                "tags": [
+                    "Candidate Applications"
+                ],
+                "summary": "List candidate applications",
+                "operationId": "c093a72fab98c82db5197929f313cad4",
+                "responses": {
+                    "200": {
+                        "description": "Applications returned"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Candidate Applications"
+                ],
+                "summary": "Submit a job application",
+                "operationId": "0e59013b00f9a44abd90dd869590cb86",
+                "responses": {
+                    "201": {
+                        "description": "Application created"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/applications/{application}": {
+            "get": {
+                "tags": [
+                    "Candidate Applications"
+                ],
+                "summary": "Show a candidate application",
+                "operationId": "f5d0f20bded2c0ce4b50893255e3869f",
+                "responses": {
+                    "200": {
+                        "description": "Application returned"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/candidate/certifications": {
             "get": {
                 "tags": [
@@ -492,6 +625,31 @@
                 "responses": {
                     "200": {
                         "description": "CV deleted"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/dashboard": {
+            "get": {
+                "tags": [
+                    "Candidate Dashboard"
+                ],
+                "summary": "Candidate dashboard aggregates",
+                "operationId": "2d78bf1f510553f2cc8a9fdee598732f",
+                "responses": {
+                    "200": {
+                        "description": "Dashboard data returned"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
                     }
                 },
                 "security": [
@@ -636,6 +794,94 @@
                 "responses": {
                     "200": {
                         "description": "OK"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/notifications": {
+            "get": {
+                "tags": [
+                    "Candidate Notifications"
+                ],
+                "summary": "List candidate in-app notifications",
+                "operationId": "1887a7f0e570e4348cc9f990b1fb69b4",
+                "responses": {
+                    "200": {
+                        "description": "Notifications returned"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/notifications/unread-count": {
+            "get": {
+                "tags": [
+                    "Candidate Notifications"
+                ],
+                "summary": "Unread notification count",
+                "operationId": "9f50d7c25cbf82175b7dc5e46b766636",
+                "responses": {
+                    "200": {
+                        "description": "Unread count returned"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/notifications/{notification}/read": {
+            "patch": {
+                "tags": [
+                    "Candidate Notifications"
+                ],
+                "summary": "Mark a notification as read",
+                "operationId": "f60270c29d1172495907ddb8a60b73f3",
+                "responses": {
+                    "200": {
+                        "description": "Notification marked as read"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/candidate/notifications/mark-all-read": {
+            "post": {
+                "tags": [
+                    "Candidate Notifications"
+                ],
+                "summary": "Mark all notifications as read",
+                "operationId": "6b7cf80bf6f44f4efb58f05bb7f232ed",
+                "responses": {
+                    "200": {
+                        "description": "Notifications marked as read"
                     }
                 },
                 "security": [
@@ -903,6 +1149,78 @@
                 }
             }
         },
+        "/company/applications": {
+            "get": {
+                "tags": [
+                    "Company Applications"
+                ],
+                "summary": "List applications for company jobs",
+                "operationId": "f9a4d13d8b2eac66cb5c9ebbfaa8e393",
+                "responses": {
+                    "200": {
+                        "description": "Applications returned"
+                    },
+                    "401": {
+                        "description": "Unauthenticated"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/company/applications/{application}": {
+            "get": {
+                "tags": [
+                    "Company Applications"
+                ],
+                "summary": "Show a company application",
+                "operationId": "19f912859e16b7d3b1bc6fc6d12080c9",
+                "responses": {
+                    "200": {
+                        "description": "Application returned"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/company/applications/{application}/status": {
+            "patch": {
+                "tags": [
+                    "Company Applications"
+                ],
+                "summary": "Transition application status",
+                "operationId": "09a9d73d7fc0562b48048ad3ef0d3af7",
+                "responses": {
+                    "200": {
+                        "description": "Status updated"
+                    },
+                    "409": {
+                        "description": "Invalid transition"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/company/jobs": {
             "get": {
                 "tags": [
@@ -1030,6 +1348,164 @@
                     },
                     "422": {
                         "description": "Invalid state"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/company/jobs/{job}/unpublish": {
+            "patch": {
+                "tags": [
+                    "Company Jobs"
+                ],
+                "summary": "Unpublish (close) a published company job",
+                "operationId": "11aa4eb4ed1b0bad19cf6e32b72f9657",
+                "parameters": [
+                    {
+                        "name": "job",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Job unpublished"
+                    },
+                    "422": {
+                        "description": "Invalid state"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/company/jobs/{job}/fit-score-settings": {
+            "get": {
+                "tags": [
+                    "Company Jobs"
+                ],
+                "summary": "Get effective fit score weights for a company job",
+                "operationId": "1675b19c0e919036ea6bc981957ad350",
+                "responses": {
+                    "200": {
+                        "description": "Settings returned"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Company Jobs"
+                ],
+                "summary": "Update custom fit score weights for a company job",
+                "operationId": "fe120e0b9ec8bfbf5fe661ed2eda419c",
+                "responses": {
+                    "200": {
+                        "description": "Settings updated"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/company/jobs/{job}/skills": {
+            "get": {
+                "tags": [
+                    "Company Jobs"
+                ],
+                "summary": "List skills for a company job",
+                "operationId": "c051db1a151789ea9452cf4fd67d411c",
+                "responses": {
+                    "200": {
+                        "description": "Skills returned"
+                    },
+                    "404": {
+                        "description": "Not found"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Company Jobs"
+                ],
+                "summary": "Replace all skills for a company job",
+                "operationId": "c1e20a9e7db036327bbc2ea961ffce8d",
+                "responses": {
+                    "200": {
+                        "description": "Skills replaced"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Company Jobs"
+                ],
+                "summary": "Attach a skill to a company job",
+                "operationId": "6b42df1a8957ec58ea233f0bee1677e6",
+                "responses": {
+                    "201": {
+                        "description": "Skill attached"
+                    },
+                    "422": {
+                        "description": "Validation failed"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/company/jobs/{job}/skills/{skill}": {
+            "delete": {
+                "tags": [
+                    "Company Jobs"
+                ],
+                "summary": "Detach a skill from a company job",
+                "operationId": "8e25dbfc2dcbcb3c1fb72d84503f0e65",
+                "responses": {
+                    "200": {
+                        "description": "Skill detached"
+                    },
+                    "404": {
+                        "description": "Not found"
                     }
                 },
                 "security": [
@@ -1268,12 +1744,32 @@
     },
     "tags": [
         {
+            "name": "Admin",
+            "description": "Admin"
+        },
+        {
             "name": "Auth",
             "description": "Auth"
         },
         {
+            "name": "Candidate Applications",
+            "description": "Candidate Applications"
+        },
+        {
             "name": "Candidate",
             "description": "Candidate"
+        },
+        {
+            "name": "Candidate Dashboard",
+            "description": "Candidate Dashboard"
+        },
+        {
+            "name": "Candidate Notifications",
+            "description": "Candidate Notifications"
+        },
+        {
+            "name": "Company Applications",
+            "description": "Company Applications"
         },
         {
             "name": "Company Jobs",

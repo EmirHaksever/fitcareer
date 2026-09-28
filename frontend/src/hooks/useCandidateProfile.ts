@@ -6,10 +6,11 @@ import { invalidateFitRelatedQueries } from '@/hooks/invalidateFitQueries';
 export const CANDIDATE_PROFILE_KEY = ['candidate', 'profile'] as const;
 export const CANDIDATE_CV_KEY = ['candidate', 'cv'] as const;
 
-export function useCandidateProfile() {
+export function useCandidateProfile(options?: { enabled?: boolean }) {
   return useQuery({
     queryKey: CANDIDATE_PROFILE_KEY,
     queryFn: () => candidateProfileApi.get(),
+    enabled: options?.enabled ?? true,
   });
 }
 

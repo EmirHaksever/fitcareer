@@ -164,6 +164,7 @@ export function JobsPage() {
         values={queryParams}
         onChange={updateParams}
         onReset={resetFilters}
+        showFitScore={showFitScore}
       />
     </div>
   );

@@ -4,6 +4,7 @@
 /.idea
 /.cursor
 /.env
+/.env.testing
 /.env.backup
 /.env.*.local
 /auth.json

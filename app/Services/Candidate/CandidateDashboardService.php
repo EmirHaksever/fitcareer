@@ -249,11 +249,18 @@ class CandidateDashboardService
             }
         }
 
-        return $this->publishedJobsQuery()
+        $jobs = $this->publishedJobsQuery()
             ->with(['company', 'sourceProvider'])
             ->orderByDesc('trust_score')
             ->orderByDesc('published_at')
             ->limit(self::RECOMMENDATION_LIMIT)
             ->get();
+
+        $analysesByJobId = $currentAnalyses->keyBy('job_id');
+
+        return $jobs->each(function (Job $job) use ($analysesByJobId): void {
+            $analysis = $analysesByJobId->get($job->id);
+            $job->setRelation('analyses', $analysis === null ? collect() : collect([$analysis]));
+        });
     }
 }

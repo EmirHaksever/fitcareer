@@ -23,6 +23,7 @@ import { CompanyJobEditPage } from '@/pages/company/CompanyJobEditPage';
 import { CompanyJobsPage } from '@/pages/company/CompanyJobsPage';
 import { CompanySettingsPage } from '@/pages/company/CompanySettingsPage';
 import { AdminCompaniesPage } from '@/pages/admin/AdminCompaniesPage';
+import { AdminSourceHealthPage } from '@/pages/admin/AdminSourceHealthPage';
 import { SavedJobsPage } from '@/pages/candidate/SavedJobsPage';
 import { FitAnalysisPage } from '@/pages/candidate/FitAnalysisPage';
 import { NotificationsPage } from '@/pages/candidate/NotificationsPage';
@@ -57,7 +58,6 @@ export default function App() {
             <Route element={<ProtectedRoute allowedRoles={['candidate']} />}>
               <Route element={<AppShell />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/jobs" element={<JobsPage />} />
                 <Route path="/applications" element={<ApplicationsPage />} />
                 <Route path="/applications/:id" element={<ApplicationDetailPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
@@ -65,6 +65,12 @@ export default function App() {
                 <Route path="/saved" element={<SavedJobsPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
+              </Route>
+            </Route>
+
+            <Route element={<ProtectedRoute allowedRoles={['candidate', 'company', 'admin']} />}>
+              <Route element={<AppShell />}>
+                <Route path="/jobs" element={<JobsPage />} />
               </Route>
             </Route>
 
@@ -89,6 +95,7 @@ export default function App() {
             <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
               <Route element={<AppShell />}>
                 <Route path="/admin/companies" element={<AdminCompaniesPage />} />
+                <Route path="/admin/sources" element={<AdminSourceHealthPage />} />
               </Route>
             </Route>
 

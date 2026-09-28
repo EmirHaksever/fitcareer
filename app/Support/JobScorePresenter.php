@@ -7,8 +7,10 @@ namespace App\Support;
 use App\Enums\AiAnalysisStatus;
 use App\Enums\AiAnalysisType;
 use App\Enums\TrustAnalysisStatus;
+use App\Models\CandidateProfile;
 use App\Models\AiAnalysis;
 use App\Models\Job;
+use App\Services\FitScore\FitScoreInputFingerprint;
 
 class JobScorePresenter
 {
@@ -140,10 +142,23 @@ class JobScorePresenter
                     && $analysis->is_latest);
         }
 
-        return $job->analyses()
+        $candidateProfile = CandidateProfile::query()->find($candidateProfileId);
+
+        if ($candidateProfile === null || $candidateProfile->cv_file_path === null) {
+            return null;
+        }
+
+        $job->loadMissing('skills');
+        $candidateProfile->loadMissing(['candidateSkills', 'skills', 'experiences']);
+
+        $analysis = $job->analyses()
             ->where('type', AiAnalysisType::CvJobFit)
             ->where('candidate_profile_id', $candidateProfileId)
             ->where('is_latest', true)
             ->first();
+
+        return $analysis !== null && FitScoreInputFingerprint::isReusable($analysis, $candidateProfile, $job)
+            ? $analysis
+            : null;
     }
 }

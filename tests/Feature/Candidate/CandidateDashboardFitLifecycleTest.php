@@ -97,6 +97,33 @@ class CandidateDashboardFitLifecycleTest extends TestCase
     }
 
     #[Test]
+    public function recommendations_do_not_reveal_historical_fit_after_cv_delete(): void
+    {
+        [, $profile, $token] = $this->createCandidateActor();
+        $job = Job::factory()->published()->create([
+            'slug' => 'dashboard-recommendation-cv-delete-role',
+        ]);
+
+        $this->seedCandidateCv($profile);
+        app(CvJobFitAnalysisService::class)->analyze($profile->fresh(), $job);
+
+        $this->withToken($token)
+            ->deleteJson('/api/v1/candidate/cv')
+            ->assertOk();
+
+        $response = $this->withToken($token)
+            ->getJson('/api/v1/candidate/dashboard')
+            ->assertOk();
+
+        $recommendedJob = collect($response->json('data.recommended_jobs'))
+            ->firstWhere('id', $job->id);
+
+        $this->assertNotNull($recommendedJob);
+        $this->assertNull($recommendedJob['fit_score']);
+        $this->assertNull($recommendedJob['fit_analysis_status']);
+    }
+
+    #[Test]
     public function job_detail_hides_fit_score_after_cv_delete(): void
     {
         [, $profile, $token] = $this->createCandidateActor();

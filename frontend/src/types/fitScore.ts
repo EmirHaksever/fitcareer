@@ -13,6 +13,8 @@ export interface FitScoreDetails {
   fit_version?: string;
   candidate_updated_at?: string | null;
   job_updated_at?: string | null;
+  weights?: Record<string, number>;
+  weight_source?: string | null;
 }
 
 export const FIT_SIGNAL_KEYS = [

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { CandidateCvActivationCard } from '@/components/candidate/CandidateCvActivationCard';
 import { TrustDistributionChart } from '@/components/dashboard/TrustDistributionChart';
 import { JobCard } from '@/components/jobs/JobCard';
 import { Button } from '@/components/ui/Button';
@@ -46,6 +47,10 @@ export function DashboardPage() {
             </Button>
           }
         />
+      ) : null}
+
+      {!isLoading && data && !data.stats.has_cv ? (
+        <CandidateCvActivationCard profileStrength={data.stats.profile_strength_score} />
       ) : null}
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -118,32 +123,32 @@ export function DashboardPage() {
             </CardBody>
           </Card>
 
-          <Card className="bg-gradient-to-br from-primary/5 to-secondary/5">
-            <CardBody className="space-y-3">
-              <h3 className="text-lg font-semibold text-ink">Kariyer İpucu</h3>
-              {assistant?.has_cv && assistant.analyzed_job_count > 0 ? (
-                <p className="text-sm text-ink-muted">
-                  {assistant.analyzed_job_count} ilan için uyum analizin mevcut.
-                  {assistant.average_fit_score !== null ? (
-                    <>
-                      {' '}
-                      Ortalama uyum skorun{' '}
-                      <span className="font-semibold text-ink">%{assistant.average_fit_score}</span>.
-                    </>
-                  ) : null}
-                </p>
-              ) : (
-                <p className="text-sm text-ink-muted">
-                  CV profilini güncel tutarak Fit Score hesaplamalarının daha doğru olmasını sağlayabilirsin.
-                </p>
-              )}
-              <Link to={assistant?.has_cv ? '/fit-analysis' : '/profile?cv=1'}>
-                <Button variant="secondary">
-                  {assistant?.has_cv ? 'Uyum Analizini Gör' : "CV'ni Analiz Et"}
-                </Button>
-              </Link>
-            </CardBody>
-          </Card>
+          {assistant?.has_cv ? (
+            <Card className="bg-gradient-to-br from-primary/5 to-secondary/5">
+              <CardBody className="space-y-3">
+                <h3 className="text-lg font-semibold text-ink">Kariyer İpucu</h3>
+                {assistant.analyzed_job_count > 0 ? (
+                  <p className="text-sm text-ink-muted">
+                    {assistant.analyzed_job_count} ilan için uyum analizin mevcut.
+                    {assistant.average_fit_score !== null ? (
+                      <>
+                        {' '}
+                        Ortalama uyum skorun{' '}
+                        <span className="font-semibold text-ink">%{assistant.average_fit_score}</span>.
+                      </>
+                    ) : null}
+                  </p>
+                ) : (
+                  <p className="text-sm text-ink-muted">
+                    İlan detaylarını inceledikçe kişisel Fit Score&apos;ların burada birikecek.
+                  </p>
+                )}
+                <Link to="/fit-analysis">
+                  <Button variant="secondary">Uyum Analizini Gör</Button>
+                </Link>
+              </CardBody>
+            </Card>
+          ) : null}
         </div>
       </section>
     </div>
