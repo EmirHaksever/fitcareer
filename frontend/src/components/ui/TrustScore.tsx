@@ -1,5 +1,5 @@
 import { ScoreRing } from '@/components/ui/ScoreRing';
-import { getTrustBand, getTrustBandLabel, isTrustPending } from '@/utils/scores';
+import { bandClasses, getTrustBand, getTrustBandLabel, isTrustPending } from '@/utils/scores';
 import { cn } from '@/utils/format';
 import type { TrustAnalysisStatus } from '@/types/api';
 
@@ -25,7 +25,7 @@ export function TrustScore({ score, status, size = 'sm', className }: TrustScore
         size={size}
       />
       {!pending && displayScore !== null ? (
-        <p className="mt-0.5 text-xs font-medium text-primary">{getTrustBandLabel(band)}</p>
+        <p className={cn('mt-0.5 text-xs font-medium', bandClasses[band])}>{getTrustBandLabel(band)}</p>
       ) : (
         <span className="mt-0.5 block h-4" aria-hidden="true" />
       )}

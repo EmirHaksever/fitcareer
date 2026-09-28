@@ -2,11 +2,12 @@ import type { TrustAnalysisStatus } from '@/types/api';
 
 export type ScoreBand = 'danger' | 'warning' | 'good' | 'excellent' | 'neutral';
 
+// Same cut-offs as config/trust_score.php labels, so badge and dashboard agree.
 export function getTrustBand(score: number | null): ScoreBand {
   if (score === null) return 'neutral';
-  if (score <= 39) return 'danger';
-  if (score <= 69) return 'warning';
-  if (score <= 84) return 'good';
+  if (score < 30) return 'danger';
+  if (score < 50) return 'warning';
+  if (score < 75) return 'good';
   return 'excellent';
 }
 
@@ -52,9 +53,9 @@ const fitBandLabels: Record<ScoreBand, string> = {
 
 const trustBandLabels: Record<ScoreBand, string> = {
   danger: 'Düşük Güven',
-  warning: 'Orta Güven',
-  good: 'Güvenilir',
-  excellent: 'Çok Güvenilir',
+  warning: 'Şüpheli',
+  good: 'Orta Güven',
+  excellent: 'Güvenilir',
   neutral: '—',
 };
 
