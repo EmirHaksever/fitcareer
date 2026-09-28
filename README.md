@@ -2,6 +2,8 @@
 
 Aday ve işveren için iş platformu. Laravel API + React / TypeScript arayüz: kayıt/giriş, CV profili, iş arama, ilan taslak/yayın, başvuru, doğrulama, Trust Score ve Fit Score.
 
+Türkiye genelindeki ilanlar, şirketlerin kendi ilan sistemlerinin (ATS) herkese açık API'lerinden düzenli olarak çekilir; her ilan için güvenilirlik (Trust Score) ve adaya uyum (Fit Score) hesaplanır.
+
 Personal portfolio project — not a company codebase.
 
 **Canlı demo:** [fitcareer.emirhaksever.com](https://fitcareer.emirhaksever.com) · **Case study:** [emirhaksever.com/proje/fitcareer-guvenilir-is-eslestirme-platformu.html](https://emirhaksever.com/proje/fitcareer-guvenilir-is-eslestirme-platformu.html)
@@ -14,14 +16,14 @@ Personal portfolio project — not a company codebase.
 
 ![İlan arama](docs/screenshots/fitcareer-search.jpg)
 
-> Ekran görüntüleri demo verisiyle alınmıştır.
+> Ekran görüntüleri demo verisiyle alınmıştır. Demo aday hesabındaki kişi kurgusaldır (`scripts/demo-persona.php`).
 
 ## Stack
 
 | Layer | Technology |
 |-------|------------|
-| Backend | Laravel 11, PHP 8.2+, MySQL |
-| Frontend | React 18, TypeScript, Vite, Tailwind CSS |
+| Backend | Laravel 12, PHP 8.2+, MySQL |
+| Frontend | React 19, TypeScript, Vite, Tailwind CSS |
 | Queue | Database driver (`queue_jobs` table) |
 | Auth | Laravel Sanctum |
 
@@ -61,17 +63,17 @@ Vite proxies `/api` to the Laravel backend (see `frontend/vite.config.ts`).
 
 ### 3. Job ingestion (optional)
 
-Job listings are ingested from ~30 active sources across the following ATS
-integrations, plus a dedicated Kariyer.net parser:
+İlanlar 5 ATS entegrasyonundaki 61 aktif kaynaktan çekilir (Eylül 2026):
 
 - Lever
 - Greenhouse
 - Workable
 - Ashby
 - Recruitee
-- Kariyer.net (scraper)
 
-Seed the source records for each provider, then trigger an import:
+Kariyer.net için bir HTML ayrıştırıcı da vardır, ancak site otomatik erişimi bot korumasıyla engellediği için canlıda kullanılmaz.
+
+Kaynak kayıtlarını oluşturup içe aktarma başlatmak için:
 
 ```bash
 php scripts/seed-lever-sources.php
@@ -79,11 +81,17 @@ php scripts/seed-greenhouse-sources.php
 php scripts/seed-workable-sources.php
 php scripts/seed-ashby-sources.php
 php scripts/seed-recruitee-sources.php
-php scripts/seed-kariyer-net-source.php
 
 php artisan jobs:import-source <source-name> --sync
 php artisan jobs:source-health
 ```
+
+Nasıl çalışır:
+
+- **Türkiye önceliği (`turkey_first`):** Kaynağın yalnızca Türkiye'deki (veya Türkiye'den uzaktan) ilanları alınır. Çok ülkeli ilanlarda Türkiye satırı korunur; yabancı ülke açıkça yazılıysa şehir adı benzerliği (ör. "Villa d'Agri" / Ağrı) ilanı Türkiye'ye taşımaz.
+- **Tazelik:** Her içe aktarmada görülen ilanın `last_seen_at` alanı güncellenir. 48 saat kaynağında görülmeyen ilan bayat sayılır, ardından yayından kalkar. İlan detayında "Son kontrol" bilgisi bu alandan gelir.
+- **Trust Score etiketleri:** 75+ Güvenilir, 50–74 Orta Güven, 30–49 Şüpheli, 30 altı Düşük Güven; skoru olmayan ilan "Değerlendirilmedi" (`config/trust_score.php`).
+- **Genel istatistik:** `GET /api/v1/stats` yayındaki ilan, güven analizi yapılmış ilan ve aktif kaynak sayısını döndürür.
 
 ## Project Structure
 
