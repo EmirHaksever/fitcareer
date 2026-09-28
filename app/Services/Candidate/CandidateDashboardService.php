@@ -97,6 +97,7 @@ class CandidateDashboardService
     {
         $labels = [
             TrustLabel::Verified->value => 'Güvenilir',
+            TrustLabel::Moderate->value => 'Orta Güven',
             TrustLabel::Unrated->value => 'Değerlendirilmedi',
             TrustLabel::Suspicious->value => 'Şüpheli',
             TrustLabel::LowTrust->value => 'Düşük Güven',

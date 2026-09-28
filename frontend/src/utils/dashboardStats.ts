@@ -41,10 +41,11 @@ export function mapDashboardStats(data: DashboardData): DashboardStat[] {
 }
 
 const bucketColors: Record<string, string> = {
-  verified: 'bg-secondary',
-  unrated: 'bg-primary',
+  verified: 'bg-primary',
+  moderate: 'bg-supporting',
   suspicious: 'bg-warning',
   low_trust: 'bg-danger',
+  unrated: 'bg-slate-400',
   pending_analysis: 'bg-surface',
 };
 

@@ -18,7 +18,7 @@ return [
 
     'labels' => [
         'verified' => 75,
-        'unrated' => 50,
+        'moderate' => 50,
         'suspicious' => 30,
     ],
 

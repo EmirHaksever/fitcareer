@@ -44,8 +44,14 @@ class CandidateDashboardTest extends TestCase
 
         Job::factory()->published()->create([
             'status' => JobStatus::Published,
-            'trust_label' => TrustLabel::Unrated,
+            'trust_label' => TrustLabel::Moderate,
             'trust_score' => 60,
+        ]);
+
+        Job::factory()->published()->create([
+            'status' => JobStatus::Published,
+            'trust_label' => TrustLabel::Unrated,
+            'trust_score' => null,
         ]);
 
         $appliedJob = Job::factory()->published()->create([
@@ -78,6 +84,13 @@ class CandidateDashboardTest extends TestCase
             ->assertJsonPath('data.stats.analyzed_job_count', 2)
             ->assertJsonCount(4, 'data.recommended_jobs')
             ->assertJsonCount(2, 'data.analyzed_jobs');
+
+        $distribution = collect($response->json('data.trust_distribution'))->keyBy('id');
+
+        $this->assertSame(3, $distribution['verified']['count']);
+        $this->assertSame('Orta Güven', $distribution['moderate']['label']);
+        $this->assertSame(1, $distribution['moderate']['count']);
+        $this->assertSame(1, $distribution['unrated']['count']);
     }
 
     #[Test]

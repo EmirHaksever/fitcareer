@@ -61,7 +61,9 @@ class TrustScoreCalculatorTest extends TestCase
     public function label_thresholds_map_to_existing_trust_labels(): void
     {
         $this->assertSame(TrustLabel::Verified, $this->labelForScore(80));
-        $this->assertSame(TrustLabel::Unrated, $this->labelForScore(60));
+        $this->assertSame(TrustLabel::Verified, $this->labelForScore(75));
+        $this->assertSame(TrustLabel::Moderate, $this->labelForScore(60));
+        $this->assertSame(TrustLabel::Moderate, $this->labelForScore(50));
         $this->assertSame(TrustLabel::Suspicious, $this->labelForScore(35));
         $this->assertSame(TrustLabel::LowTrust, $this->labelForScore(10));
     }

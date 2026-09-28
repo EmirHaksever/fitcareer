@@ -24,13 +24,16 @@ export function TrustDistributionChart({ buckets, totalJobs }: TrustDistribution
           const colorClass = colorClassForTrustBucket(bucket.id);
 
           return (
-            <div key={bucket.id} className="flex flex-1 flex-col items-center gap-2">
+            <div key={bucket.id} className="flex h-full flex-1 flex-col items-center gap-2">
               <span className="text-xs font-medium text-ink-muted">{bucket.count}</span>
-              <div
-                className={`w-full rounded-t-lg ${colorClass}`}
-                style={{ height: `${height}%`, minHeight: bucket.count > 0 ? '12px' : '4px' }}
-                title={`${bucket.label}: ${bucket.count}`}
-              />
+              {/* Percentage heights need a parent with a definite height. */}
+              <div className="flex w-full flex-1 items-end">
+                <div
+                  className={`w-full rounded-t-lg ${colorClass}`}
+                  style={{ height: `${height}%`, minHeight: bucket.count > 0 ? '12px' : '4px' }}
+                  title={`${bucket.label}: ${bucket.count}`}
+                />
+              </div>
             </div>
           );
         })}

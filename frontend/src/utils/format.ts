@@ -48,6 +48,7 @@ export function formatExperienceLevel(value: string | null): string {
 export function formatTrustLabel(value: string): string {
   const map: Record<string, string> = {
     verified: 'Güvenilir',
+    moderate: 'Orta Güven',
     suspicious: 'Şüpheli',
     low_trust: 'Düşük Güven',
     unrated: 'Değerlendirilmedi',

@@ -109,8 +109,8 @@ class TrustScoreCalculator
             return TrustLabel::Verified;
         }
 
-        if ($score >= (int) $thresholds['unrated']) {
-            return TrustLabel::Unrated;
+        if ($score >= (int) $thresholds['moderate']) {
+            return TrustLabel::Moderate;
         }
 
         if ($score >= (int) $thresholds['suspicious']) {
